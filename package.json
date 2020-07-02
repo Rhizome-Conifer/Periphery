@@ -1,0 +1,18 @@
+{
+  "name": "warc-boundaries",
+  "version": "1.0.0",
+  "description": "",
+  "main": "boundary-list.js",
+  "dependencies": {
+    "lit-element": "^2.3.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^8.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

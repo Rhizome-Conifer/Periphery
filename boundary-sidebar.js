@@ -1,9 +1,18 @@
+let boundaryList = require('./boundary-list');
+let boundary = require('./boundary');
+let overlayToolti = require('./overlay-tooltip');
 
-import { BoundaryList } from './boundary-list.js';
-import { applyStylesToNodes, attachDivOverlay } from './boundary.js';
-import { OverlayTooltip } from './overlay-tooltip.js';
 
-class BoundarySidebar extends HTMLElement {
+import {LitElement, html} from 'lit-element';
+
+class BoundarySidebar extends LitElement {
+    static get properties() {
+        return {
+            boundaries: {type: Array, attribute: false},
+            boundaryOverlays: {type: Object, attribute: false},
+        }
+    }
+
     constructor() {
         super();
         this._boundaries = {};
@@ -63,7 +72,8 @@ class BoundarySidebar extends HTMLElement {
         @param boundary: the Boundary object corresponding to the element the event was fired on
         @param container: a reference to the sidebar container element
     */
-    handleBoundaryFocus(boundary, container) {
+    handleBoundaryFocus(boundary) {
+        let container = this.shadowRoot.getElementById('sidebar-container');
         if (this._boundaryOverlays[boundary.idx] === undefined) {
             let overlayRoot = document.createElement('div');
             overlayRoot.class = 'overlay-root';
@@ -124,7 +134,6 @@ class BoundarySidebar extends HTMLElement {
     */
     populateBoundaryList() {
         let outerFrame = this.shadowRoot.getElementById('boundary-list');
-        let container = this.shadowRoot.getElementById('sidebar-container');
         this._boundaries.forEach(function(boundary, idx) {
             boundary.idx = idx;
             if ('content' in document.createElement('template')) {
@@ -153,19 +162,37 @@ class BoundarySidebar extends HTMLElement {
             }    
         }.bind(this))
     }
+
+    render() {
+        return html`
+        <div id="sidebar-container">
+            <input type="checkbox" id="sidebar-toggle">
+            <label for="sidebar-toggle" class="sidebar-toggle-icon">
+                <div class="sidebar-check">i</div>
+            </label>
+            <div id="boundary-sidebar">
+                <ul id="boundary-list">
+                    ${this.boundaries.map((boundary) => 
+                        html`<li class="boundary" tab-index="1" @mouseenter=${(e) => {this.handleBoundaryFocus(boundary)}} @mouseexit=${(e) => {this.handleBoundaryBlur(boundary)}}>
+                            <div class="boundary-title">${boundary.action}</div>
+                            <div class="boundary-description">${boundary.description}</div>
+                            <div class="boundary-contents">
+                                ${boundary.overlays == undefined ? html`` : 
+                                    html`
+                                        <div class="boundary-overlay">
+                                            Overlays visible: 
+                                        </div>
+                                        ${boundary.overlays.map((overlay, idx) => html`
+                                            <label for=${'overlay-display-' + boundary.idx + idx}>${overlay.type}</label>
+                                            <input type='checkbox' id=${'overlay-display-' + boundary.idx + idx}></input>
+                                        `)}`}
+                                <div class="overlay-root"></div>
+                            </div>
+                        </li>`)}
+                </ul>
+            </div>    
+        </div>`;
+    }
 }
 
 customElements.define('boundary-sidebar', BoundarySidebar);
-customElements.define('overlay-tooltip', OverlayTooltip);
-
-
-/* 
-    Once DOM content is loaded, apply boundaries
-*/
-document.addEventListener("DOMContentLoaded", () => {
-    var boundaries = new BoundaryList(meta);
-    boundaries.applyBoundaries();
-    let sidebar = document.querySelector('boundary-sidebar');
-    sidebar.boundaries = boundaries.getBoundaries();
-    sidebar.populateBoundaryList();
-});

@@ -1,6 +1,6 @@
 import { OverlayTooltip } from './overlay-tooltip.js';
 
-export class Boundary {
+class Boundary {
     constructor(boundary) {
         this.affectedNodes = [];
         this.type = boundary.type || 'on-load';
@@ -172,12 +172,16 @@ export class Boundary {
     }
 }
 
+module.exports = {
+    Boundary: Boundary
+};
+
 /*
 Applies an object with CSS style key-value pairs to a list of nodes.
 nodes: a NodeList or array containing the nodes to which to apply styling.
 styles: an object containing key-value pairs representing CSS attributes.
 */
-export function applyStylesToNodes(nodes, styles) {
+module.exports.applyStylesToNodes = (nodes, styles) => {
     nodes.forEach(function(node) {
         Object.keys(styles).forEach(function (key) {
             node.style[key] = styles[key];
@@ -185,7 +189,7 @@ export function applyStylesToNodes(nodes, styles) {
     })
 }
 
-export function attachDivOverlay(elem, className, description, styling) {
+module.exports.attachDivOverlay = (elem, className, description, styling) => {
     let overlay;
     if (className == 'overlay-tooltip') {
         if (customElements.get('overlay-tooltip') == undefined) {
