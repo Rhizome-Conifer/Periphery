@@ -1,6 +1,6 @@
-import { OverlayTooltip } from './overlay-tooltip.js';
+import { OverlayTooltip } from './overlay-tooltip';
 
-class Boundary {
+export class Boundary {
     constructor(boundary) {
         this.affectedNodes = [];
         this.type = boundary.type || 'on-load';
@@ -143,7 +143,7 @@ class Boundary {
     /*
         Selects all elements with href attribute and queries whether they point to an in-boundary resource
     */
-    linkQuery = function(node) {
+    linkQuery(node) {
         if (node && node.nodeType === Node.ELEMENT_NODE) {
             let allLinks = []
             node.querySelectorAll('[href]').forEach(function (elem) {
@@ -167,21 +167,17 @@ class Boundary {
         }
     }
 
-    CSSSelector = function(node) {
+    CSSSelector(node) {
         return new Promise((resolve) => {resolve(node.querySelectorAll(this.selector))});
     }
 }
-
-module.exports = {
-    Boundary: Boundary
-};
 
 /*
 Applies an object with CSS style key-value pairs to a list of nodes.
 nodes: a NodeList or array containing the nodes to which to apply styling.
 styles: an object containing key-value pairs representing CSS attributes.
 */
-module.exports.applyStylesToNodes = (nodes, styles) => {
+export function applyStylesToNodes(nodes, styles) {
     nodes.forEach(function(node) {
         Object.keys(styles).forEach(function (key) {
             node.style[key] = styles[key];
@@ -189,7 +185,7 @@ module.exports.applyStylesToNodes = (nodes, styles) => {
     })
 }
 
-module.exports.attachDivOverlay = (elem, className, description, styling) => {
+export function attachDivOverlay(elem, className, description, styling) {
     let overlay;
     if (className == 'overlay-tooltip') {
         if (customElements.get('overlay-tooltip') == undefined) {

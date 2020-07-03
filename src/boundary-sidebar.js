@@ -4,6 +4,7 @@
 
 
 import {LitElement, html, css} from 'lit-element';
+import {BoundaryList} from './boundary-list'
 
 export class BoundarySidebar extends LitElement {
     static get styles() {
@@ -112,14 +113,19 @@ export class BoundarySidebar extends LitElement {
     static get properties() {
         return {
             boundaries: {attribute: false},
-            boundaryOverlays: {attribute: false},
         }
+    }
+
+    set boundaries(value) {
+        let oldVal = this._boundaries;
+        this._boundaries = new BoundaryList(value);
+        this.requestUpdate('boundaries', oldVal);
     }
 
     constructor() {
         super();
-        this.boundaries = [];
-        this.boundaryOverlays = {};
+        this._boundaries = [];
+        this._boundaryOverlays = {};
     }
 
     /*
@@ -165,6 +171,7 @@ export class BoundarySidebar extends LitElement {
         @param container: a reference to the sidebar container element
     */
     handleBoundaryFocus(boundary) {
+        console.log(boundary)
         let container = this.shadowRoot.getElementById('sidebar-container');
         if (this._boundaryOverlays[boundary.idx] === undefined) {
             let overlayRoot = document.createElement('div');
@@ -264,8 +271,11 @@ export class BoundarySidebar extends LitElement {
             </label>
             <div id="boundary-sidebar">
                 <ul id="boundary-list">
-                    ${this.boundaries === undefined ? html`` : this.boundaries.map((boundary) => 
-                        html`<li class="boundary" tab-index="1" @mouseenter=${(e) => {this.handleBoundaryFocus(boundary)}} @mouseexit=${(e) => {this.handleBoundaryBlur(boundary)}}>
+                    ${this._boundaries.boundaries === undefined ? html`` : this._boundaries.boundaries.map((boundary) => 
+                        html`<li class="boundary" 
+                                tab-index="1" 
+                                @mouseenter=${(e) => {this.handleBoundaryFocus(boundary)}} 
+                                @mouseexit=${(e) => {this.handleBoundaryBlur(boundary)}}>
                             <div class="boundary-title">${boundary.action}</div>
                             <div class="boundary-description">${boundary.description}</div>
                             <div class="boundary-contents">
@@ -275,7 +285,10 @@ export class BoundarySidebar extends LitElement {
                                             Overlays visible: 
                                         </div>
                                         ${boundary.overlays.map((overlay, idx) => html`
-                                            <label for=${'overlay-display-' + boundary.idx + idx}>${overlay.type}</label>
+                                            <label 
+                                                for=${'overlay-display-' + boundary.idx + idx}>
+                                                ${overlay.type}
+                                            </label>
                                             <input type='checkbox' id=${'overlay-display-' + boundary.idx + idx}></input>
                                         `)}`}
                                 <div class="overlay-root"></div>

@@ -1,4 +1,4 @@
-import { Boundary } from './boundary.js';
+import { Boundary } from './boundary';
 
 export class BoundaryList {
     constructor(boundaries) {
@@ -9,11 +9,7 @@ export class BoundaryList {
             }.bind(this))    
         }
     }
-
-    getBoundaries() {
-        return this.boundaries;
-    }
-
+    
     applyBoundaries() {
         let observerBoundaries = [];
         // Should always apply boundaries once on DOM load, whether or not the boundary is 'observer' type or not
