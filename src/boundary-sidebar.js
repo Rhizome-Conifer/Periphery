@@ -3,9 +3,112 @@
 // let overlayToolti = require('./overlay-tooltip');
 
 
-import {LitElement, html} from 'lit-element';
+import {LitElement, html, css} from 'lit-element';
 
 export class BoundarySidebar extends LitElement {
+    static get styles() {
+        return css`
+            #sidebar-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+      
+            #boundary-sidebar {
+                background-color: white;
+                z-index: 9999;
+                width: 200px;
+                height: 100%;
+                position: fixed;
+                right: 0;
+                transform: translateX(420px);
+                transition: transform 250ms ease-in-out;
+                border-left: 1px solid black;
+            }
+      
+            .sidebar-check {
+                width: 30px;
+                height: 30px;
+                background-color: white;
+                border: 1px solid black;
+                text-align: center;
+                line-height: 30px;
+                font-size: 24px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+      
+            .sidebar-toggle-icon {
+                position: fixed;
+                bottom: 50px;
+                right: 50px;
+                z-index: 10000;
+            }
+        
+            ul#boundary-list {
+                display: flex;
+                flex-direction: column;
+                padding: 0;
+            }
+        
+            #sidebar-toggle:checked ~ #boundary-sidebar {
+                transform: translateX(0);
+            }
+        
+            #sidebar-toggle {
+                display: none;
+            }
+        
+            .boundary {
+                list-style: none;
+                background-color: #ffffff;
+                border: 1px solid black;
+                padding: 5px;
+                margin: 10px;
+                display: inline-block;
+                position: relative;
+                max-height: 40px;
+                height: auto;
+                transition: max-height 300ms ease-in-out;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                box-sizing: border-box;
+            }
+        
+            .boundary:focus, .boundary.focus {
+                max-height: 500px;
+            }
+        
+            .boundary:hover {
+                border: 3px solid black;
+                padding: 3px;
+            }
+        
+            .boundary-description {
+                margin: 0 0 10px;
+            }
+        
+            .boundary-title {
+                font-weight: bold;
+            }
+        
+            .overlay-root {
+                position: fixed;
+                top: 0px;
+                left: 0px;
+            }
+        
+            .default-overlay {
+                background-color: rgba(0,0,0,0.5);
+                position: absolute;
+                z-index: 9998;
+            }
+        `;
+    }
+
     static get properties() {
         return {
             boundaries: {attribute: false},
@@ -15,8 +118,8 @@ export class BoundarySidebar extends LitElement {
 
     constructor() {
         super();
-        this._boundaries = [];
-        this._boundaryOverlays = {};
+        this.boundaries = [];
+        this.boundaryOverlays = {};
     }
 
     /*
@@ -161,7 +264,7 @@ export class BoundarySidebar extends LitElement {
             </label>
             <div id="boundary-sidebar">
                 <ul id="boundary-list">
-                    ${this.boundaries.map((boundary) => 
+                    ${this.boundaries === undefined ? html`` : this.boundaries.map((boundary) => 
                         html`<li class="boundary" tab-index="1" @mouseenter=${(e) => {this.handleBoundaryFocus(boundary)}} @mouseexit=${(e) => {this.handleBoundaryBlur(boundary)}}>
                             <div class="boundary-title">${boundary.action}</div>
                             <div class="boundary-description">${boundary.description}</div>
