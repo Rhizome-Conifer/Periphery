@@ -1,33 +1,22 @@
-let boundaryList = require('./boundary-list');
-let boundary = require('./boundary');
-let overlayToolti = require('./overlay-tooltip');
+// let boundaryList = require('./boundary-list');
+// let boundary = require('./boundary');
+// let overlayToolti = require('./overlay-tooltip');
 
 
 import {LitElement, html} from 'lit-element';
 
-class BoundarySidebar extends LitElement {
+export class BoundarySidebar extends LitElement {
     static get properties() {
         return {
-            boundaries: {type: Array, attribute: false},
-            boundaryOverlays: {type: Object, attribute: false},
+            boundaries: {attribute: false},
+            boundaryOverlays: {attribute: false},
         }
     }
 
     constructor() {
         super();
-        this._boundaries = {};
+        this._boundaries = [];
         this._boundaryOverlays = {};
-        let shadowRoot = this.attachShadow({mode: 'open'});
-        let tmpl = document.getElementById('boundary-sidebar-template'); 
-        shadowRoot.appendChild(tmpl.content.cloneNode(true));
-    }
-
-    get boundaries() {
-        return this._boundaries;
-    }
-
-    set boundaries(boundaries) {
-        this._boundaries = boundaries;
     }
 
     /*
