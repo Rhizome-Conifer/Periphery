@@ -153,22 +153,26 @@ export class BoundarySidebar extends LitElement {
         @parameter elem: the overlay container element corresponding to the Boundary
         @parameter container: the sidebar container element
     */
-    applyDefaultOverlays(boundary, elem, container) {
-        // TODO migrate this function to new LitElement framework
+    defaultOverlays(boundary) {
         if (boundary.affectedNodes !== undefined) {
-            let boundaryRect = container.getBoundingClientRect();
-            boundary.affectedNodes.forEach((node) => {
-                let rect = node.getBoundingClientRect();
-                if (rect.width > 0 && rect.height > 0) {
+            let boundaryRect = this.shadowRoot.querySelector('#boundary-sidebar').getBoundingClientRect();
+            return html`
+                ${boundary.affectedNodes.map((node) => {
+                    let rect = node.getBoundingClientRect();
                     let styles = {
                         'width': rect.width + 'px',
                         'height': rect.height + 'px',
                         'top': (rect.y - boundaryRect.y) + 'px',
                         'left': (rect.x - boundaryRect.x) + 'px'
                     };
-                    attachDivOverlay(elem, 'default-overlay', null, styles);
-                }
-            })
+                    return rect.width > 0 && rect.height > 0 ? html`
+                        <boundary-overlay 
+                            style=${styles}
+                            className='boundary'>
+                        </boundary-overlay>
+                    ` : html``;
+                })}
+            `
         }
     }
 
@@ -263,7 +267,9 @@ export class BoundarySidebar extends LitElement {
                             <div class="boundary-description">${boundary.description}</div>
                             <div class="boundary-contents">
                                 ${boundary.overlays == undefined ? html`` : this.overlayList(boundary)}
-                                <div class="overlay-root"></div>
+                                <div class="overlay-root">
+                                    ${this.defaultOverlays(boundary, )}
+                                </div>
                             </div>
                         </li>`)}
                 </ul>

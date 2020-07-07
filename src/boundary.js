@@ -1,6 +1,6 @@
-import { OverlayTooltip } from './overlay-tooltip';
+import { OverlayTooltip } from './overlay';
 import {LitElement, html, css} from 'lit-element';
-import {styleMap} from 'lit-html/directives/class-map';
+import {styleMap} from 'lit-html/directives/style-map';
 
 
 
@@ -189,21 +189,7 @@ export function applyStylesToNodes(nodes, styles) {
     })
 }
 
-
-export class Overlay extends LitElement {
-    render() {
-        return html`
-            <div
-                data-after=${this.description || ''}
-                style=${styleMap(this.styles)}
-            >
-
-            </div>
-        `;
-    }
-}
-
-// export function attachDivOverlay(elem, className, description, styling) {
+export function attachDivOverlay(elem, className, description, styling) {
 //     let overlay;
 //     if (className == 'overlay-tooltip') {
 //         if (customElements.get('overlay-tooltip') == undefined) {
@@ -222,7 +208,7 @@ export class Overlay extends LitElement {
 //     }
 //     elem.appendChild(overlay);
 //     return overlay;
-// }
+}
 
 
 
