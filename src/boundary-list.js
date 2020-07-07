@@ -4,12 +4,14 @@ export class BoundaryList {
     constructor(boundaries) {
         this.boundaries = [];
         if (boundaries !== undefined) {
-            boundaries.forEach(function(boundary) {
-                this.boundaries.push(new Boundary(boundary));
+            boundaries.forEach(function(boundary, idx) {
+                let boundaryObject = new Boundary(boundary);
+                boundaryObject.idx = idx;
+                this.boundaries.push(boundaryObject);
             }.bind(this))    
         }
     }
-    
+
     applyBoundaries() {
         let observerBoundaries = [];
         // Should always apply boundaries once on DOM load, whether or not the boundary is 'observer' type or not

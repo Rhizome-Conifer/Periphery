@@ -4,6 +4,7 @@
 
 
 import {LitElement, html, css} from 'lit-element';
+import { classMap } from 'lit-html/directives/class-map';
 import {BoundaryList} from './boundary-list'
 
 export class BoundarySidebar extends LitElement {
@@ -113,12 +114,16 @@ export class BoundarySidebar extends LitElement {
     static get properties() {
         return {
             boundaries: {attribute: false},
+            boundaryElemClasses: {attribute: false},
         }
     }
 
     set boundaries(value) {
         let oldVal = this._boundaries;
         this._boundaries = new BoundaryList(value);
+        this._boundaries.boundaries.forEach((boundary) => {
+            this.boundaryElemClasses[boundary] = {"boundary": true};
+        })
         this.requestUpdate('boundaries', oldVal);
     }
 
@@ -126,17 +131,18 @@ export class BoundarySidebar extends LitElement {
         super();
         this._boundaries = [];
         this._boundaryOverlays = {};
+        this.boundaryElemClasses = {};
     }
 
     /*
         Handle onclick for boundary visibility checkbox
     */
     onCheck(elem, boundary, overlayId) {
-        if (elem.checked) {
-            boundary.showOverlays(overlayId);
-        } else {
-            boundary.hideOverlays(overlayId);
-        }
+        // if (elem.checked) {
+        //     boundary.showOverlays(overlayId);
+        // } else {
+        //     boundary.hideOverlays(overlayId);
+        // }
     }
     
     // TODO: figure out whether this function should live here
@@ -208,58 +214,50 @@ export class BoundarySidebar extends LitElement {
     /*
         Populate the boundary element with inputs representing overlays
     */
-    populateOverlayList(boundary, boundaryElem) {
-        let overlayElem = boundaryElem.querySelector('.boundary-overlay');
-        boundary.overlays.forEach(function(overlay, idx) {
+    // populateOverlayList(boundary, boundaryElem) {
+    //     let overlayElem = boundaryElem.querySelector('.boundary-overlay');
+    //     boundary.overlays.forEach(function(overlay, idx) {
+    //         let overlayId = 'overlay-display-' + boundary.idx + idx;
+    //         let label = document.createElement('label');
+    //         label.for = overlayId;
+    //         label.innerHTML = overlay.type;
+    //         overlayElem.appendChild(label);
+
+    //         let overlayDisplay = document.createElement('input');
+    //         overlayDisplay.id = overlayId;
+    //         overlayDisplay.type = 'checkbox';
+    //         overlayDisplay.addEventListener('focus', () => {boundaryElem.classList.add('focus')});
+    //         overlayDisplay.addEventListener('blur', () => {boundaryElem.classList.remove('focus')});
+    //         overlayDisplay.checked = overlay.display == 'visible';
+    //         overlayDisplay.onclick = () => {this.onCheck(overlayDisplay, boundary, overlayId)};
+    //         overlayElem.appendChild(overlayDisplay);
+    //     }.bind(this))
+    // }
+
+    overlayList(boundary) {
+        return html`
+        <div class="boundary-overlay">
+            Overlays visible: 
+        </div>
+        ${boundary.overlays.map((overlay, idx) => {
             let overlayId = 'overlay-display-' + boundary.idx + idx;
-            let label = document.createElement('label');
-            label.for = overlayId;
-            label.innerHTML = overlay.type;
-            overlayElem.appendChild(label);
-
-            let overlayDisplay = document.createElement('input');
-            overlayDisplay.id = overlayId;
-            overlayDisplay.type = 'checkbox';
-            overlayDisplay.addEventListener('focus', () => {boundaryElem.classList.add('focus')});
-            overlayDisplay.addEventListener('blur', () => {boundaryElem.classList.remove('focus')});
-            overlayDisplay.checked = overlay.display == 'visible';
-            overlayDisplay.onclick = () => {this.onCheck(overlayDisplay, boundary, overlayId)};
-            overlayElem.appendChild(overlayDisplay);
-        }.bind(this))
-    }
-
-    /*
-        Populate the boundary sidebar with elements corresponding to each boundary.
-    */
-    populateBoundaryList() {
-        let outerFrame = this.shadowRoot.getElementById('boundary-list');
-        this._boundaries.forEach(function(boundary, idx) {
-            boundary.idx = idx;
-            if ('content' in document.createElement('template')) {
-                let boundaryTemplate = document.querySelector('#boundary-template').content;
-                let boundaryElem = boundaryTemplate.children[0].cloneNode(true);
-                boundaryElem.tabIndex = '1';
-                outerFrame.appendChild(boundaryElem);
-                boundaryElem.addEventListener('mouseenter', function(event) {
-                    this.handleBoundaryFocus(boundary, container);
-                }.bind(this));
-                boundaryElem.addEventListener('mouseleave', function() {
-                    this.handleBoundaryBlur(boundary);
-                }.bind(this))
-        
-                let title = boundaryElem.querySelector('.boundary-title');
-                title.innerHTML = boundary.action;
-        
-                if (boundary.description !== undefined) {
-                    boundaryElem.querySelector('.boundary-description').innerHTML = boundary.description;
-                }
-            
-                if (boundary.overlays !== undefined) {
-                    this.populateOverlayList(boundary, boundaryElem);
-                }
-                
-            }    
-        }.bind(this))
+            return html`
+            <label 
+                for=${overlayId}>
+                ${overlay.type}
+            </label>
+            <input 
+                type='checkbox' 
+                check = ${overlay.display == 'visible'}
+                @focus = ${() => {this.boundaryElemClasses[boundary].focus = true;
+                                    this.requestUpdate();
+                                    console.log(this.boundaryElemClasses[boundary])}} 
+                @blur = ${() => {this.boundaryElemClasses[boundary].focus = false;
+                                this.requestUpdate();}}
+                @click = ${(e) => this.onCheck(e.target, boundary, overlayId)}
+                id=${overlayId}>
+            </input>
+        `})}`;
     }
 
     render() {
@@ -272,25 +270,14 @@ export class BoundarySidebar extends LitElement {
             <div id="boundary-sidebar">
                 <ul id="boundary-list">
                     ${this._boundaries.boundaries === undefined ? html`` : this._boundaries.boundaries.map((boundary) => 
-                        html`<li class="boundary" 
-                                tab-index="1" 
+                        html`<li class="${classMap(this.boundaryElemClasses[boundary])}" 
+                                tabindex="1" 
                                 @mouseenter=${(e) => {this.handleBoundaryFocus(boundary)}} 
                                 @mouseexit=${(e) => {this.handleBoundaryBlur(boundary)}}>
                             <div class="boundary-title">${boundary.action}</div>
                             <div class="boundary-description">${boundary.description}</div>
                             <div class="boundary-contents">
-                                ${boundary.overlays == undefined ? html`` : 
-                                    html`
-                                        <div class="boundary-overlay">
-                                            Overlays visible: 
-                                        </div>
-                                        ${boundary.overlays.map((overlay, idx) => html`
-                                            <label 
-                                                for=${'overlay-display-' + boundary.idx + idx}>
-                                                ${overlay.type}
-                                            </label>
-                                            <input type='checkbox' id=${'overlay-display-' + boundary.idx + idx}></input>
-                                        `)}`}
+                                ${boundary.overlays == undefined ? html`` : this.overlayList(boundary)}
                                 <div class="overlay-root"></div>
                             </div>
                         </li>`)}
