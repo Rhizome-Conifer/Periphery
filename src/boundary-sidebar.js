@@ -145,7 +145,6 @@ export class BoundarySidebar extends LitElement {
         // }
     }
     
-    // TODO: figure out whether this function should live here
 
     /*
         Create default-display (on hover) overlays corresponding to a boundary's affected elements.
@@ -212,28 +211,9 @@ export class BoundarySidebar extends LitElement {
     }
 
     /*
-        Populate the boundary element with inputs representing overlays
+        Returns input elements corresponding to a boundry's overlays
+        @param boundary: 
     */
-    // populateOverlayList(boundary, boundaryElem) {
-    //     let overlayElem = boundaryElem.querySelector('.boundary-overlay');
-    //     boundary.overlays.forEach(function(overlay, idx) {
-    //         let overlayId = 'overlay-display-' + boundary.idx + idx;
-    //         let label = document.createElement('label');
-    //         label.for = overlayId;
-    //         label.innerHTML = overlay.type;
-    //         overlayElem.appendChild(label);
-
-    //         let overlayDisplay = document.createElement('input');
-    //         overlayDisplay.id = overlayId;
-    //         overlayDisplay.type = 'checkbox';
-    //         overlayDisplay.addEventListener('focus', () => {boundaryElem.classList.add('focus')});
-    //         overlayDisplay.addEventListener('blur', () => {boundaryElem.classList.remove('focus')});
-    //         overlayDisplay.checked = overlay.display == 'visible';
-    //         overlayDisplay.onclick = () => {this.onCheck(overlayDisplay, boundary, overlayId)};
-    //         overlayElem.appendChild(overlayDisplay);
-    //     }.bind(this))
-    // }
-
     overlayList(boundary) {
         return html`
         <div class="boundary-overlay">
@@ -291,4 +271,3 @@ export class BoundarySidebar extends LitElement {
     }
 }
 
-customElements.define('boundary-sidebar', BoundarySidebar);
