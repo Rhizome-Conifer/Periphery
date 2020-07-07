@@ -115,6 +115,7 @@ export class BoundarySidebar extends LitElement {
         return {
             boundaries: {attribute: false},
             boundaryElemClasses: {attribute: false},
+            boundaryDefaultOverlays: {attribute: false}
         }
     }
 
@@ -123,6 +124,7 @@ export class BoundarySidebar extends LitElement {
         this._boundaries = new BoundaryList(value);
         this._boundaries.boundaries.forEach((boundary) => {
             this.boundaryElemClasses[boundary.idx] = {"boundary": true};
+            this.boundaryDefaultOverlays[boundary.idx] = false;
         })
         this.requestUpdate('boundaries', oldVal);
     }
@@ -132,6 +134,7 @@ export class BoundarySidebar extends LitElement {
         this._boundaries = [];
         this._boundaryOverlays = {};
         this.boundaryElemClasses = {};
+        this.boundaryDefaultOverlays = {};
     }
 
     /*
@@ -163,12 +166,14 @@ export class BoundarySidebar extends LitElement {
                         'width': rect.width + 'px',
                         'height': rect.height + 'px',
                         'top': (rect.y - boundaryRect.y) + 'px',
-                        'left': (rect.x - boundaryRect.x) + 'px'
+                        'left': (rect.x - boundaryRect.x) + 'px',
+                        'visibility': this.boundaryDefaultOverlays[boundary.idx] ? 'visible' : 'hidden'
                     };
                     return rect.width > 0 && rect.height > 0 ? html`
                         <boundary-overlay 
                             style=${styles}
-                            className='boundary'>
+                            className='boundary'
+                        >
                         </boundary-overlay>
                     ` : html``;
                 })}
@@ -182,25 +187,8 @@ export class BoundarySidebar extends LitElement {
         @param container: a reference to the sidebar container element
     */
     handleBoundaryFocus(boundary) {
-        // TODO migrate this function to new LitElement framework
-        let container = this.shadowRoot.getElementById('sidebar-container');
-        if (this._boundaryOverlays[boundary.idx] === undefined) {
-            let overlayRoot = document.createElement('div');
-            overlayRoot.class = 'overlay-root';
-            container.appendChild(overlayRoot);
-            this._boundaryOverlays[boundary.idx] = overlayRoot;
-        }
-
-        let root = this._boundaryOverlays[boundary.idx];
-        if (root !== undefined) {
-            if (root.querySelector('.default-overlay') == null) {
-                // TODO determine whether this needs to check to see whether boundary.affectedNodes has been updated
-                this.applyDefaultOverlays(boundary, root, container);
-            }
-            root.querySelectorAll('.default-overlay').forEach(function(node) {
-                node.style.display = 'block';
-            })
-        }
+        this.boundaryDefaultOverlays[boundary.idx] = true;
+        this.requestUpdate();
     }
 
     /*
@@ -208,12 +196,8 @@ export class BoundarySidebar extends LitElement {
         @param boundary: the Boundary object representing the boundary whose corresponding element the event was fired on.
     */
     handleBoundaryBlur(boundary) {
-        let root = this._boundaryOverlays[boundary.idx];
-        if (root !== undefined) {           
-            root.querySelectorAll('.default-overlay').forEach(function(node) {
-                node.style.display = 'none';
-            })
-        }
+        this.boundaryDefaultOverlays[boundary.idx] = false;
+        this.requestUpdate();
     }
 
     /*
@@ -268,7 +252,7 @@ export class BoundarySidebar extends LitElement {
                             <div class="boundary-contents">
                                 ${boundary.overlays == undefined ? html`` : this.overlayList(boundary)}
                                 <div class="overlay-root">
-                                    ${this.defaultOverlays(boundary, )}
+                                    ${this.defaultOverlays(boundary)}
                                 </div>
                             </div>
                         </li>`)}
