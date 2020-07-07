@@ -1,4 +1,8 @@
 import { OverlayTooltip } from './overlay-tooltip';
+import {LitElement, html, css} from 'lit-element';
+import {styleMap} from 'lit-html/directives/class-map';
+
+
 
 export class Boundary {
     constructor(boundary) {
@@ -185,26 +189,40 @@ export function applyStylesToNodes(nodes, styles) {
     })
 }
 
-export function attachDivOverlay(elem, className, description, styling) {
-    let overlay;
-    if (className == 'overlay-tooltip') {
-        if (customElements.get('overlay-tooltip') == undefined) {
-            customElements.define('overlay-tooltip', OverlayTooltip);
-        }
-        overlay = document.createElement("overlay-tooltip");
-    } else {
-        overlay = document.createElement("div");
-        overlay.className = className;
+
+export class Overlay extends LitElement {
+    render() {
+        return html`
+            <div
+                data-after=${this.description || ''}
+                style=${styleMap(this.styles)}
+            >
+
+            </div>
+        `;
     }
-    if (description) {
-        overlay.setAttribute('data-after', description);
-    }
-    if (styling) {
-        applyStylesToNodes([overlay], styling);
-    }
-    elem.appendChild(overlay);
-    return overlay;
 }
+
+// export function attachDivOverlay(elem, className, description, styling) {
+//     let overlay;
+//     if (className == 'overlay-tooltip') {
+//         if (customElements.get('overlay-tooltip') == undefined) {
+//             customElements.define('overlay-tooltip', OverlayTooltip);
+//         }
+//         overlay = document.createElement("overlay-tooltip");
+//     } else {
+//         overlay = document.createElement("div");
+//         overlay.className = className;
+//     }
+//     if (description) {
+//         overlay.setAttribute('data-after', description);
+//     }
+//     if (styling) {
+//         applyStylesToNodes([overlay], styling);
+//     }
+//     elem.appendChild(overlay);
+//     return overlay;
+// }
 
 
 

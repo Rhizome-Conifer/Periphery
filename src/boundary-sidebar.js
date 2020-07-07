@@ -4,7 +4,7 @@
 
 
 import {LitElement, html, css} from 'lit-element';
-import { classMap } from 'lit-html/directives/class-map';
+import {classMap} from 'lit-html/directives/class-map';
 import {BoundaryList} from './boundary-list'
 
 export class BoundarySidebar extends LitElement {
@@ -138,11 +138,12 @@ export class BoundarySidebar extends LitElement {
         Handle onclick for boundary visibility checkbox
     */
     onCheck(elem, boundary, overlayId) {
-        // if (elem.checked) {
-        //     boundary.showOverlays(overlayId);
-        // } else {
-        //     boundary.hideOverlays(overlayId);
-        // }
+        // TODO migrate this method to new LitElement format
+        if (elem.checked) {
+            boundary.showOverlays(overlayId);
+        } else {
+            boundary.hideOverlays(overlayId);
+        }
     }
     
 
@@ -153,6 +154,7 @@ export class BoundarySidebar extends LitElement {
         @parameter container: the sidebar container element
     */
     applyDefaultOverlays(boundary, elem, container) {
+        // TODO migrate this function to new LitElement framework
         if (boundary.affectedNodes !== undefined) {
             let boundaryRect = container.getBoundingClientRect();
             boundary.affectedNodes.forEach((node) => {
@@ -176,7 +178,7 @@ export class BoundarySidebar extends LitElement {
         @param container: a reference to the sidebar container element
     */
     handleBoundaryFocus(boundary) {
-        console.log(boundary)
+        // TODO migrate this function to new LitElement framework
         let container = this.shadowRoot.getElementById('sidebar-container');
         if (this._boundaryOverlays[boundary.idx] === undefined) {
             let overlayRoot = document.createElement('div');
@@ -232,12 +234,11 @@ export class BoundarySidebar extends LitElement {
                 @focus = ${() => {
                                     this.boundaryElemClasses[boundary.idx].focus = true;
                                     this.requestUpdate();
-                                    console.log(this.boundaryElemClasses);
                                 }} 
-                @blur = ${() => {this.boundaryElemClasses[boundary.idx].focus = false;
-                                this.requestUpdate();
-                                console.log(this.boundaryElemClasses);
-                            }}
+                @blur = ${() => {
+                                    this.boundaryElemClasses[boundary.idx].focus = false;
+                                    this.requestUpdate();
+                                }}
                 @click = ${(e) => this.onCheck(e.target, boundary, overlayId)}
                 id=${overlayId}>
             </input>
