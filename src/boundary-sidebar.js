@@ -122,7 +122,7 @@ export class BoundarySidebar extends LitElement {
         let oldVal = this._boundaries;
         this._boundaries = new BoundaryList(value);
         this._boundaries.boundaries.forEach((boundary) => {
-            this.boundaryElemClasses[boundary] = {"boundary": true};
+            this.boundaryElemClasses[boundary.idx] = {"boundary": true};
         })
         this.requestUpdate('boundaries', oldVal);
     }
@@ -249,11 +249,15 @@ export class BoundarySidebar extends LitElement {
             <input 
                 type='checkbox' 
                 check = ${overlay.display == 'visible'}
-                @focus = ${() => {this.boundaryElemClasses[boundary].focus = true;
+                @focus = ${() => {
+                                    this.boundaryElemClasses[boundary.idx].focus = true;
                                     this.requestUpdate();
-                                    console.log(this.boundaryElemClasses[boundary])}} 
-                @blur = ${() => {this.boundaryElemClasses[boundary].focus = false;
-                                this.requestUpdate();}}
+                                    console.log(this.boundaryElemClasses);
+                                }} 
+                @blur = ${() => {this.boundaryElemClasses[boundary.idx].focus = false;
+                                this.requestUpdate();
+                                console.log(this.boundaryElemClasses);
+                            }}
                 @click = ${(e) => this.onCheck(e.target, boundary, overlayId)}
                 id=${overlayId}>
             </input>
@@ -270,7 +274,7 @@ export class BoundarySidebar extends LitElement {
             <div id="boundary-sidebar">
                 <ul id="boundary-list">
                     ${this._boundaries.boundaries === undefined ? html`` : this._boundaries.boundaries.map((boundary) => 
-                        html`<li class="${classMap(this.boundaryElemClasses[boundary])}" 
+                        html`<li class="${classMap(this.boundaryElemClasses[boundary.idx])}" 
                                 tabindex="1" 
                                 @mouseenter=${(e) => {this.handleBoundaryFocus(boundary)}} 
                                 @mouseexit=${(e) => {this.handleBoundaryBlur(boundary)}}>
