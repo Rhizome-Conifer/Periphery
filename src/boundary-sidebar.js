@@ -1,8 +1,3 @@
-// let boundaryList = require('./boundary-list');
-// let boundary = require('./boundary');
-// let overlayToolti = require('./overlay-tooltip');
-
-
 import {LitElement, html, css} from 'lit-element';
 import {classMap} from 'lit-html/directives/class-map';
 import {BoundaryList} from './boundary-list'

@@ -1,4 +1,4 @@
-import { OverlayTooltip } from './overlay';
+import { OverlayTooltip, Overlay } from './overlay';
 import {LitElement, html, css} from 'lit-element';
 import {styleMap} from 'lit-html/directives/style-map';
 
@@ -190,6 +190,10 @@ export function applyStylesToNodes(nodes, styles) {
 }
 
 export function attachDivOverlay(elem, className, description, styling) {
+    let overlay = document.createElement('boundary-overlay');
+    overlay.className = className;
+    overlay.description = description;
+    overlay.style = styling;
 //     let overlay;
 //     if (className == 'overlay-tooltip') {
 //         if (customElements.get('overlay-tooltip') == undefined) {

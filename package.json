@@ -2,7 +2,7 @@
   "name": "warc-boundaries",
   "version": "1.0.0",
   "description": "",
-  "main": "boundary-list.js",
+  "main": "src/boundary-sidebar.js",
   "dependencies": {
     "lit-element": "^2.3.1"
   },
