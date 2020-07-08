@@ -219,7 +219,7 @@ export class BoundarySidebar extends LitElement {
             </label>
             <input 
                 type='checkbox' 
-                check = ${overlay.display == 'visible'}
+                checked = ${overlay.display == 'visible'}
                 @focus = ${() => {
                                     this.boundaryElemClasses[boundary.idx].focus = true;
                                     this.requestUpdate();

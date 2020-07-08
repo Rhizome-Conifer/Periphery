@@ -65,10 +65,6 @@ export class Overlay extends LitElement {
         }
     }
 
-    static set styles(value) {
-        console.log(value);
-    }
-
     constructor() {
         super();
         this.styles = {};

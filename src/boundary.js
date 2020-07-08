@@ -75,14 +75,15 @@ export class Boundary {
     }
 
     showOverlays(overlayId) {
+        console.log(this.overlayDivs);
         this.overlayDivs[overlayId].forEach(function(overlayDiv) {
-            overlayDiv.style.opacity = 1;
+            overlayDiv.style.visibility = 'visible';
         })
     }
 
     hideOverlays(overlayId) {
         this.overlayDivs[overlayId].forEach(function(overlayDiv) {
-            overlayDiv.style.opacity = 0;
+            overlayDiv.style.visibility = 'hidden';
         })
     }
 
@@ -193,25 +194,9 @@ export function attachDivOverlay(elem, className, description, styling) {
     let overlay = document.createElement('boundary-overlay');
     overlay.className = className;
     overlay.description = description;
-    overlay.style = styling;
-//     let overlay;
-//     if (className == 'overlay-tooltip') {
-//         if (customElements.get('overlay-tooltip') == undefined) {
-//             customElements.define('overlay-tooltip', OverlayTooltip);
-//         }
-//         overlay = document.createElement("overlay-tooltip");
-//     } else {
-//         overlay = document.createElement("div");
-//         overlay.className = className;
-//     }
-//     if (description) {
-//         overlay.setAttribute('data-after', description);
-//     }
-//     if (styling) {
-//         applyStylesToNodes([overlay], styling);
-//     }
-//     elem.appendChild(overlay);
-//     return overlay;
+    overlay.styles = styling;
+    elem.appendChild(overlay);
+    return overlay;
 }
 
 
