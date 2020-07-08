@@ -38,14 +38,7 @@ export function linkQuery(node) {
         }.bind(this));
 
         return Promise.all(allLinks).then((nodes) => {
-            let affectedNodes = []
-            nodes.forEach((nodeVal) => {
-                let [node, isPresent] = nodeVal;
-                if (!isPresent) {
-                    affectedNodes.push(node);
-                }
-            })
-            return affectedNodes;
+            return nodes.filter(nodeItem => !(nodeItem[1])).map(nodeItem => nodeItem[0]);
         })
     }
 }
