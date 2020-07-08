@@ -1,5 +1,7 @@
 import {LitElement, html, css} from 'lit-element';
 import {classMap} from 'lit-html/directives/class-map';
+import {styleMap} from 'lit-html/directives/style-map';
+
 import {BoundaryList} from './boundary-list'
 
 export class BoundarySidebar extends LitElement {
@@ -161,16 +163,17 @@ export class BoundarySidebar extends LitElement {
                 ${boundary.affectedNodes.map((node) => {
                     let rect = node.getBoundingClientRect();
                     let styles = {
-                        'width': rect.width + 'px',
-                        'height': rect.height + 'px',
-                        'top': (rect.y - boundaryRect.y) + 'px',
-                        'left': (rect.x - boundaryRect.x) + 'px',
-                        'visibility': this.boundaryDefaultOverlays[boundary.idx] ? 'visible' : 'hidden'
+                        width: rect.width + 'px',
+                        height: rect.height + 'px',
+                        top: (rect.y - boundaryRect.y) + 'px',
+                        left: (rect.x - boundaryRect.x) + 'px',
+                        visibility: this.boundaryDefaultOverlays[boundary.idx] ? 'visible' : 'hidden',
+                        opacity: 1
                     };
                     return rect.width > 0 && rect.height > 0 ? html`
                         <boundary-overlay 
-                            style=${styles}
-                            className='boundary'
+                            .styles=${styles}
+                            className='overlay'
                         >
                         </boundary-overlay>
                     ` : html``;
@@ -244,7 +247,7 @@ export class BoundarySidebar extends LitElement {
                         html`<li class="${classMap(this.boundaryElemClasses[boundary.idx])}" 
                                 tabindex="1" 
                                 @mouseenter=${(e) => {this.handleBoundaryFocus(boundary)}} 
-                                @mouseexit=${(e) => {this.handleBoundaryBlur(boundary)}}>
+                                @mouseleave=${(e) => {this.handleBoundaryBlur(boundary)}}>
                             <div class="boundary-title">${boundary.action}</div>
                             <div class="boundary-description">${boundary.description}</div>
                             <div class="boundary-contents">

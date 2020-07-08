@@ -59,22 +59,25 @@ export class Overlay extends LitElement {
 
     static get properties() {
         return {
-            style: {type: Object, reflect: true},
+            styles: {attribute: false},
             description: {type: String, reflect: true},
             className: {type: String, reflect: true}
         }
     }
-    
+
+    static set styles(value) {
+        console.log(value);
+    }
+
     constructor() {
         super();
-        this.style = {};
-        this.description = '';
+        this.styles = {};
     }
 
     render() {
         return html`
             <div class=${this.className}
-                style=${styleMap(this.style)}
+                style=${styleMap(this.styles)}
                 data-after=${this.description || ''}
             ></div>
         `
