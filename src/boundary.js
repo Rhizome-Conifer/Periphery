@@ -3,8 +3,7 @@ import {LitElement, html, css} from 'lit-element';
 import {styleMap} from 'lit-html/directives/style-map';
 
 import { applyStylesToNodes, attachDivOverlay, inlineStyle } from './mutator';
-
-
+import { cssSelector, linkQuery } from './selector';
 
 export class Boundary {
     constructor(boundary) {
@@ -21,8 +20,8 @@ export class Boundary {
         this.overlays = boundary.overlays;
 
         this.selectorFuncs = {
-            'css-selector': this.CSSSelector,
-            'link-query': this.linkQuery
+            'css-selector': cssSelector,
+            'link-query': linkQuery
         }
 
     }
@@ -94,7 +93,7 @@ export class Boundary {
             matchedNodes = inlineStyle(document.head, this.actionStyle, this.selector);
         } else {
             let selectorFunc = this.selectorFuncs[this.selectorType].bind(this);
-            matchedNodes = selectorFunc(node).then(function(nodes) {
+            matchedNodes = selectorFunc(node, this.selector).then(function(nodes) {
                 if (this.action == 'disable') {
                     this.actionStyle = {'pointer-events': 'none'};
                 }
@@ -111,58 +110,6 @@ export class Boundary {
         }.bind(this));    
     }
 
-    cdxQuery(uri) {
-        return fetch(uri).then
-        (res => res.text()).then
-        (response => response != '');
-    }
-
-    /*
-        Queries backend CDX server to determine whether a given resource exists in the archive.
-        link: A Node containing the href to check
-    */
-    queryResource(link) {
-        let node = link;
-        let href = node.href;
-        if (!href.startsWith('javascript')) {
-            let url = host + "cdx?output=json&url=" + encodeURIComponent(href);
-            return this.cdxQuery(url).then(isPresent => isPresent);
-        } else {
-            // for javascript() hrefs and other things that we know aren't within boundary
-            return new Promise((resolve) => resolve(false));
-        }
-    }
-
-    /*
-        Selects all elements with href attribute and queries whether they point to an in-boundary resource
-    */
-    linkQuery(node) {
-        if (node && node.nodeType === Node.ELEMENT_NODE) {
-            let allLinks = []
-            node.querySelectorAll('[href]').forEach(function (elem) {
-                // create structure containing links and whether they're within boundary
-                allLinks.push(this.queryResource(elem)
-                .then((isPresent) => {
-                    return [elem, isPresent]
-                }))
-            }.bind(this));
-
-            return Promise.all(allLinks).then((nodes) => {
-                let affectedNodes = []
-                nodes.forEach((nodeVal) => {
-                    let [node, isPresent] = nodeVal;
-                    if (!isPresent) {
-                        affectedNodes.push(node);
-                    }
-                })
-                return affectedNodes;
-            })
-        }
-    }
-
-    CSSSelector(node) {
-        return new Promise((resolve) => {resolve(node.querySelectorAll(this.selector))});
-    }
 }
 
 
