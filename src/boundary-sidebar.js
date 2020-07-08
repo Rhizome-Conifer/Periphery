@@ -117,6 +117,9 @@ export class BoundarySidebar extends LitElement {
     set boundaries(value) {
         let oldVal = this._boundaries;
         this._boundaries = new BoundaryList(value);
+        this._boundaries.applyBoundaries();
+
+        // Set up stylng for overlay divs and UI list element
         this._boundaries.boundaries.forEach((boundary) => {
             this.boundaryElemClasses[boundary.idx] = {"boundary": true};
             this.boundaryDefaultOverlays[boundary.idx] = false;

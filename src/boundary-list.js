@@ -13,6 +13,7 @@ export class BoundaryList {
     }
 
     applyBoundaries() {
+
         let observerBoundaries = [];
         // Should always apply boundaries once on DOM load, whether or not the boundary is 'observer' type or not
         this.boundaries.forEach(function (boundary) {
