@@ -2,6 +2,8 @@ import { OverlayTooltip, Overlay } from './overlay';
 import {LitElement, html, css} from 'lit-element';
 import {styleMap} from 'lit-html/directives/style-map';
 
+import { applyStylesToNodes, attachDivOverlay, inlineStyle } from './mutator';
+
 
 
 export class Boundary {
@@ -75,7 +77,6 @@ export class Boundary {
     }
 
     showOverlays(overlayId) {
-        console.log(this.overlayDivs);
         this.overlayDivs[overlayId].forEach(function(overlayDiv) {
             overlayDiv.style.visibility = 'visible';
         })
@@ -90,7 +91,7 @@ export class Boundary {
     applyBoundary(node) {
         let matchedNodes;
         if (this.action == 'inline-style') {
-            matchedNodes = inlineStyle(document.head);
+            matchedNodes = inlineStyle(document.head, this.actionStyle, this.selector);
         } else {
             let selectorFunc = this.selectorFuncs[this.selectorType].bind(this);
             matchedNodes = selectorFunc(node).then(function(nodes) {
@@ -109,19 +110,6 @@ export class Boundary {
             }
         }.bind(this));    
     }
-
-    /*
-        Builds a valid CSS style based on an object containing CSS attribuets in key-value pairs, and adds it to the DOM in a <style> element.
-    */
-    inlineStyle(node) {
-        let attributes = JSON.stringify(this.actionStyle).split(',').join(';');
-        let styleString = this.selector + ' ' + attributes.split('\"').join('');
-
-        let style = document.createElement('style');
-        style.type = 'text/css';
-        style.appendChild(document.createTextNode(styleString));
-        node.appendChild(style);
-    };
 
     cdxQuery(uri) {
         return fetch(uri).then
@@ -177,27 +165,6 @@ export class Boundary {
     }
 }
 
-/*
-Applies an object with CSS style key-value pairs to a list of nodes.
-nodes: a NodeList or array containing the nodes to which to apply styling.
-styles: an object containing key-value pairs representing CSS attributes.
-*/
-export function applyStylesToNodes(nodes, styles) {
-    nodes.forEach(function(node) {
-        Object.keys(styles).forEach(function (key) {
-            node.style[key] = styles[key];
-        });
-    })
-}
-
-export function attachDivOverlay(elem, className, description, styling) {
-    let overlay = document.createElement('boundary-overlay');
-    overlay.className = className;
-    overlay.description = description;
-    overlay.styles = styling;
-    elem.appendChild(overlay);
-    return overlay;
-}
 
 
 
