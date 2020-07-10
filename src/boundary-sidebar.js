@@ -61,6 +61,8 @@ export class BoundarySidebar extends LitElement {
             }
         
             .boundary {
+                font-size: 14px;
+                line-height: 20px;
                 list-style: none;
                 background-color: #ffffff;
                 border: 1px solid black;
@@ -68,7 +70,7 @@ export class BoundarySidebar extends LitElement {
                 margin: 10px;
                 display: inline-block;
                 position: relative;
-                max-height: 40px;
+                max-height: 50px;
                 height: auto;
                 transition: max-height 300ms ease-in-out;
                 overflow: hidden;
@@ -77,7 +79,7 @@ export class BoundarySidebar extends LitElement {
                 box-sizing: border-box;
             }
         
-            .boundary:focus, .boundary.focus {
+            .boundary.focus {
                 max-height: 500px;
             }
         
@@ -85,9 +87,18 @@ export class BoundarySidebar extends LitElement {
                 border: 3px solid black;
                 padding: 3px;
             }
+
+            .boundary.focus > .boundary-description {
+                overflow: visible;
+                white-space: normal;
+            }
         
             .boundary-description {
                 margin: 0 0 10px;
+                min-height: 20px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
             }
         
             .boundary-title {
@@ -259,6 +270,11 @@ export class BoundarySidebar extends LitElement {
         this.requestUpdate();
     }
 
+    handleBoundaryFocus(boundary, val) {
+        this.boundaryElemClasses[boundary.idx].focus = val;
+        this.requestUpdate();
+    }
+
     /*
         Returns input elements corresponding to a boundry's overlays
         @param boundary: 
@@ -305,7 +321,10 @@ export class BoundarySidebar extends LitElement {
                         html`<li class="${classMap(this.boundaryElemClasses[boundary.idx])}" 
                                 tabindex="1" 
                                 @mouseenter=${(e) => {this.handleBoundaryFocus(boundary)}} 
-                                @mouseleave=${(e) => {this.handleBoundaryBlur(boundary)}}>
+                                @mouseleave=${(e) => {this.handleBoundaryBlur(boundary)}}
+                                @focus=${() => this.handleBoundaryFocus(boundary, true)}
+                                @blur=${() => this.handleBoundaryFocus(boundary, false)}
+                                >
                             <div class="boundary-title">${boundary.action}</div>
                             <div class="boundary-description">${boundary.description}</div>
                             <div class="boundary-contents">
