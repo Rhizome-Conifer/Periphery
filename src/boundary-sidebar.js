@@ -256,17 +256,8 @@ export class BoundarySidebar extends LitElement {
         @param boundary: the Boundary object corresponding to the element the event was fired on
         @param container: a reference to the sidebar container element
     */
-    handleBoundaryFocus(boundary) {
-        this.boundaryDefaultOverlays[boundary.idx] = true;
-        this.requestUpdate();
-    }
-
-    /*
-        Handle mouse leave / blur event for a given boundary.
-        @param boundary: the Boundary object representing the boundary whose corresponding element the event was fired on.
-    */
-    handleBoundaryBlur(boundary) {
-        this.boundaryDefaultOverlays[boundary.idx] = false;
+    handleBoundaryMouse(boundary, val) {
+        this.boundaryDefaultOverlays[boundary.idx] = val;
         this.requestUpdate();
     }
 
@@ -320,10 +311,10 @@ export class BoundarySidebar extends LitElement {
                     ${this._boundaries.boundaries === undefined ? html`` : this._boundaries.boundaries.map((boundary) => 
                         html`<li class="${classMap(this.boundaryElemClasses[boundary.idx])}" 
                                 tabindex="1" 
-                                @mouseenter=${(e) => {this.handleBoundaryFocus(boundary)}} 
-                                @mouseleave=${(e) => {this.handleBoundaryBlur(boundary)}}
-                                @focus=${() => this.handleBoundaryFocus(boundary, true)}
-                                @blur=${() => this.handleBoundaryFocus(boundary, false)}
+                                @mouseenter=${(e) => {this.handleBoundaryMouse(boundary, true)}} 
+                                @mouseleave=${(e) => {this.handleBoundaryMouse(boundary, false)}}
+                                @focus=${(e) => this.handleBoundaryFocus(boundary, true)}
+                                @blur=${(e) => this.handleBoundaryFocus(boundary, false)}
                                 >
                             <div class="boundary-title">${boundary.action}</div>
                             <div class="boundary-description">${boundary.description}</div>
