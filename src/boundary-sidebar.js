@@ -88,6 +88,11 @@ export class BoundarySidebar extends LitElement {
                 padding: 3px;
             }
 
+            .boundary-contents {
+                display: flex;
+                flex-direction: column;
+            }
+
             .boundary.focus > .boundary-description {
                 overflow: visible;
                 white-space: normal;
@@ -252,15 +257,20 @@ export class BoundarySidebar extends LitElement {
     }
 
     /*
-        Handle mouse enter / focus event for a given boundary sidebar element.
+        Handle mouse enter / exit events for a given boundary sidebar element.
         @param boundary: the Boundary object corresponding to the element the event was fired on
-        @param container: a reference to the sidebar container element
+        @param val: whether the boundary's overlays should be shown.
     */
     handleBoundaryMouse(boundary, val) {
         this.boundaryDefaultOverlays[boundary.idx] = val;
         this.requestUpdate();
     }
 
+    /*
+        Handler for focus / blur events for a given boundary sidebar element.
+        @param boundary: the Boundary object corresponding to the element the event was fired on
+        @param val: whether the 'focus' class should be applied to the boundary element.
+    */
     handleBoundaryFocus(boundary, val) {
         this.boundaryElemClasses[boundary.idx].focus = val;
         this.requestUpdate();
@@ -278,24 +288,26 @@ export class BoundarySidebar extends LitElement {
         ${boundary.overlays.map((overlay, idx) => {
             let overlayId = 'overlay-display-' + boundary.idx + idx;
             return html`
-            <label 
-                for=${overlayId}>
-                ${overlay.type}
-            </label>
-            <input 
-                type='checkbox' 
-                checked = ${overlay.display == 'visible'}
-                @focus = ${() => {
-                                    this.boundaryElemClasses[boundary.idx].focus = true;
-                                    this.requestUpdate();
-                                }} 
-                @blur = ${() => {
-                                    this.boundaryElemClasses[boundary.idx].focus = false;
-                                    this.requestUpdate();
-                                }}
-                @click = ${(e) => this.onCheck(e.target, boundary, overlayId)}
-                id=${overlayId}>
-            </input>
+            <div class="overlay-container">
+                <label 
+                    for=${overlayId}>
+                    ${overlay.type}
+                </label>
+                <input 
+                    type='checkbox' 
+                    checked = ${overlay.display == 'visible'}
+                    @focus = ${() => {
+                                        this.boundaryElemClasses[boundary.idx].focus = true;
+                                        this.requestUpdate();
+                                    }} 
+                    @blur = ${() => {
+                                        this.boundaryElemClasses[boundary.idx].focus = false;
+                                        this.requestUpdate();
+                                    }}
+                    @click = ${(e) => this.onCheck(e.target, boundary, overlayId)}
+                    id=${overlayId}>
+                </input>
+            </div>
         `})}`;
     }
 
