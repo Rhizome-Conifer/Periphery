@@ -46,6 +46,7 @@ export function linkQuery(node) {
 
         let t1 = window.performance.now()
 
+        // Query all deduped hrefs and correspond with their in-boundary status
         allHrefsDedup.forEach(function(href) {
             allLinkPromises.push(queryResource(href)
                 .then((isPresent) => {

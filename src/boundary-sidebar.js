@@ -256,6 +256,7 @@ export class BoundarySidebar extends LitElement {
                                     ${this.defaultOverlays(boundary)}
                                 </div>
                             </div>
+                            
                         </li>`)}
                 </ul>
             </div>    
