@@ -1,3 +1,4 @@
+
 /*
     Determine whether a given backend CDX query returns a result.
 */
@@ -29,6 +30,7 @@ function queryResource(link) {
 export function linkQuery(node) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allLinks = []
+        let t1 = window.performance.now()
         node.querySelectorAll('[href]').forEach(function (elem) {
             // create structure containing links and whether they're within boundary
             allLinks.push(queryResource(elem)
@@ -38,6 +40,8 @@ export function linkQuery(node) {
         }.bind(this));
 
         return Promise.all(allLinks).then((nodes) => {
+            let t2 = window.performance.now();
+            console.log('link query took ' + (t2 - t1) + ' ms.');
             return nodes.filter(nodeItem => !(nodeItem[1])).map(nodeItem => nodeItem[0]);
         })
     }

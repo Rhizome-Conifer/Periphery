@@ -40,12 +40,18 @@ export class Boundary {
         }.bind(this));
     }
 
+    /*
+        Show all overlay elements matching a given overlay ID.
+    */
     showOverlays(overlayId) {
         this.overlayDivs[overlayId].forEach(function(overlayDiv) {
             overlayDiv.style.visibility = 'visible';
         })
     }
 
+    /*
+        Hide all overlay elements matching a given overlay ID.
+    */
     hideOverlays(overlayId) {
         this.overlayDivs[overlayId].forEach(function(overlayDiv) {
             overlayDiv.style.visibility = 'hidden';
