@@ -12,11 +12,9 @@ function checkCdxQueryResult(uri) {
     Queries backend CDX server to determine whether a given resource exists in the archive.
     link: A Node containing the href to check
 */
-function queryResource(link) {
-    let node = link;
-    let href = node.href;
+function queryResource(href) {
     if (!href.startsWith('javascript')) {
-        let url = host + "cdx?output=json&url=" + encodeURIComponent(href);
+        let url = host + "cdx?output=json&limit=1&url=" + encodeURIComponent(href);
         return checkCdxQueryResult(url).then(isPresent => isPresent);
     } else {
         // for javascript() hrefs and other things that we know aren't within boundary
@@ -24,25 +22,55 @@ function queryResource(link) {
     }
 }
 
+function buildHrefListDedup(nodes) {
+    let allHref = [];
+    let allHrefDedup = [];
+    nodes.forEach(function(node) {
+        let ref = node.href;
+        allHref.push(ref);
+        if (allHrefDedup.indexOf(ref) == -1) {
+            allHrefDedup.push(ref);
+        }
+    });
+    return allHrefDedup;
+}
+
 /*
     Selects all elements with href attribute and queries whether they point to an in-boundary resource
 */
 export function linkQuery(node) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
-        let allLinks = []
-        let t1 = window.performance.now()
-        node.querySelectorAll('[href]').forEach(function (elem) {
-            // create structure containing links and whether they're within boundary
-            allLinks.push(queryResource(elem)
-            .then((isPresent) => {
-                return [elem, isPresent]
-            }))
-        }.bind(this));
+        let allHrefNodes = node.querySelectorAll('[href]');
+        let allHrefsDedup = buildHrefListDedup(allHrefNodes);
+        let allLinkPromises = [];
 
-        return Promise.all(allLinks).then((nodes) => {
+        let t1 = window.performance.now()
+
+        allHrefsDedup.forEach(function(href) {
+            allLinkPromises.push(queryResource(href)
+                .then((isPresent) => {
+                    return [href, isPresent];
+                })
+            );
+        }); 
+
+        return Promise.all(allLinkPromises).then((nodes) => {
+            let allLinkResults = {};
+
+            nodes.forEach(function (node) {
+                allLinkResults[node[0]] = node[1];
+            })
+
+            let filteredNodes = [];
+            allHrefNodes.forEach(function (node) {
+                if (allLinkResults[node.href]) {
+                    filteredNodes.push(node);
+                }
+            })
+
             let t2 = window.performance.now();
             console.log('link query took ' + (t2 - t1) + ' ms.');
-            return nodes.filter(nodeItem => !(nodeItem[1])).map(nodeItem => nodeItem[0]);
+            return filteredNodes;
         })
     }
 }
