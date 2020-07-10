@@ -64,7 +64,7 @@ export function linkQuery(node) {
 
             let filteredNodes = [];
             allHrefNodes.forEach(function (node) {
-                if (allLinkResults[node.href]) {
+                if (!allLinkResults[node.href]) {
                     filteredNodes.push(node);
                 }
             })

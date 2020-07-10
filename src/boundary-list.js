@@ -65,25 +65,30 @@ export class BoundaryList {
             }.bind(this));
         }
         // Update the list of added nodes, and attach overlays if applicable
-        matchedNodes.then(function(nodes) {
+        return matchedNodes.then(function(nodes) {
             boundary.pushAddedNodes(nodes);
             if (boundary.overlays !== undefined) {
                 this.createOverlays(boundary);
             }
+            return boundary;
         }.bind(this));    
     }
 
     /*
         Apply all boundary functions and create overlays, if applicable.
     */
-    applyBoundaries() {
+    applyBoundaries(onLoadCallback) {
         let observerBoundaries = [];
         // Should always apply boundaries once on DOM load, whether or not the boundary is 'observer' type or not
         this.boundaries.forEach(function (boundary) {
             if (boundary.type == 'observer') {
                 observerBoundaries.push(boundary);
             }
-            this.applyBoundary(boundary, document.body);   
+            this.applyBoundary(boundary, document.body).then((boundary) => {
+                if (onLoadCallback) {
+                    onLoadCallback(boundary);
+                }
+            });   
         }.bind(this));
     
         if (observerBoundaries.length > 0) {

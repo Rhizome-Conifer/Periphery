@@ -105,6 +105,61 @@ export class BoundarySidebar extends LitElement {
                 position: absolute;
                 z-index: 9998;
             }
+
+            .loading {
+                pointer-events: none;
+            }
+
+            .loader-container {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.7);
+                top: 0;
+                left: 0;
+            }
+
+            .loader,
+            .loader::after {
+                border-radius: 50%;
+                width: 10px;
+                height: 10px;
+            }
+            .loader {
+                margin: 10px auto;
+                font-size: 10px;
+                position: relative;
+                text-indent: -9999em;
+                border-top: 5px solid rgba(0, 0, 0, 0.2);
+                border-right: 5px solid rgba(0, 0, 0, 0.2);
+                border-bottom: 5px solid rgba(0, 0, 0, 0.2);
+                border-left: 5px solid #dddddd;
+                -webkit-transform: translateZ(0);
+                -ms-transform: translateZ(0);
+                transform: translateZ(0);
+                -webkit-animation: load8 1.1s infinite linear;
+                animation: load8 1.1s infinite linear;
+            }
+            @-webkit-keyframes load8 {
+            0% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+            }
+            @keyframes load8 {
+            0% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+            }
         `;
     }
 
@@ -119,11 +174,14 @@ export class BoundarySidebar extends LitElement {
     set boundaries(value) {
         let oldVal = this._boundaries;
         this._boundaries = new BoundaryList(value);
-        this._boundaries.applyBoundaries();
+        this._boundaries.applyBoundaries(function(boundary) {
+            this.boundaryElemClasses[boundary.idx].loading = false;
+            this.requestUpdate();
+        }.bind(this));
 
         // Set up stylng for overlay divs and UI list element
         this._boundaries.boundaries.forEach((boundary) => {
-            this.boundaryElemClasses[boundary.idx] = {"boundary": true};
+            this.boundaryElemClasses[boundary.idx] = {"boundary": true, "loading": true};
             this.boundaryDefaultOverlays[boundary.idx] = false;
         })
         this.requestUpdate('boundaries', oldVal);
@@ -256,7 +314,13 @@ export class BoundarySidebar extends LitElement {
                                     ${this.defaultOverlays(boundary)}
                                 </div>
                             </div>
-                            
+                            ${this.boundaryElemClasses[boundary.idx].loading ? html`
+                                <div class="loader-container">
+                                    <div class="loader">
+                                        Loading...
+                                    </div>
+                                </div>
+                            ` : html``}
                         </li>`)}
                 </ul>
             </div>    
