@@ -115,12 +115,6 @@ export class BoundarySidebar extends LitElement {
                 top: 0px;
                 left: 0px;
             }
-        
-            .default-overlay {
-                background-color: rgba(0,0,0,0.5);
-                position: absolute;
-                z-index: 9998;
-            }
 
             .loading {
                 pointer-events: none;
