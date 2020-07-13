@@ -94,11 +94,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 describe('loads boundary correctly', () => {
+    const initBoundary = (boundary) => {
+        return () => new _src_boundary__WEBPACK_IMPORTED_MODULE_0__["Boundary"](boundary);
+    }
+
     test('checks for boundary type', () => {
-        const t = () => {
-            let testBoundary = new _src_boundary__WEBPACK_IMPORTED_MODULE_0__["Boundary"]({});
-        }
-        expect(t).toThrow(Error);
+        let testCase = initBoundary({});
+        expect(testCase).toThrow(Error);
     })
 });
 
