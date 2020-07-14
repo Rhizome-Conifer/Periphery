@@ -7,11 +7,32 @@ export function mutatorTestRunner() {
             return () => attachDivOverlay(testParent, className, description, styling);
         }
     
-        test('attach empty overlay', () => {
-            let emptyCase = attachDiv(null, null, null);
-            attachDiv();
-            expect(true).toEqual(true);
+        test('attach overlay with incorrect property types', () => {
+            let expectedTemplate = [
+                '\n            <div class=',
+                '\n                style=',
+                '\n                data-after=',
+                '\n            ></div>\n        '
+            ];
+            let parent = document.createElement('div');
+            let overlay = attachDivOverlay(parent, ["Test", "Test"], {"Test": "test"}, "asdf");
+            expect(overlay.render().strings).toEqual(expectedTemplate);
         });
+
+        test('attach overlay with style map', () => {
+            let expectedTemplate = [
+                '\n            <div class=',
+                '\n                style=',
+                '\n                data-after=',
+                '\n            ></div>\n        '
+            ];
+            let parent = document.createElement('div');
+            let overlay = attachDivOverlay(parent, "test", {"color": "red"});
+            console.log(overlay.render().strings)
+            expect(overlay.render().strings).toEqual(expectedTemplate);
+        });
+
+
     
     });
 }
