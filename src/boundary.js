@@ -4,6 +4,10 @@ import { cssSelector, linkQuery } from './selector';
 export class Boundary {
     constructor(boundary) {
         this.affectedNodes = [];
+        if (boundary.resource === undefined) {
+            throw new Error('Missing / incorrect resource matcher for boundary.')
+        }
+
         if (boundary.type !== 'on-load' && boundary.type !== 'mutation-observer') {
             throw new Error('Incorrect type for boundary.')
         }

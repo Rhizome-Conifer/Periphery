@@ -5,8 +5,19 @@ describe('loads boundary correctly', () => {
         return () => new Boundary(boundary);
     }
 
+    test('checks for boundary resource match', () => {
+        let emptyCase = initBoundary({});
+        expect(emptyCase).toThrow(Error);
+    });
+
     test('checks for boundary type', () => {
-        let testCase = initBoundary({});
-        expect(testCase).toThrow(Error);
-    })
+        let emptyCase = initBoundary({"resource": "all"});
+        expect(emptyCase).toThrow(Error);
+    });
+
+    test('checks for boundary type', () => {
+        let emptyCase = initBoundary({"resource": "all"});
+        expect(emptyCase).toThrow(Error);
+    });
+
 });
