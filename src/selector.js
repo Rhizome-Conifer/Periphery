@@ -44,8 +44,6 @@ export function linkQuery(node) {
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
         let allLinkPromises = [];
 
-        let t1 = window.performance.now()
-
         // Query all deduped hrefs and correspond with their in-boundary status
         allHrefsDedup.forEach(function(href) {
             allLinkPromises.push(queryResource(href)
@@ -57,7 +55,6 @@ export function linkQuery(node) {
 
         return Promise.all(allLinkPromises).then((nodes) => {
             let allLinkResults = {};
-
             nodes.forEach(function (node) {
                 allLinkResults[node[0]] = node[1];
             })
@@ -68,9 +65,6 @@ export function linkQuery(node) {
                     filteredNodes.push(node);
                 }
             })
-
-            let t2 = window.performance.now();
-            console.log('link query took ' + (t2 - t1) + ' ms.');
             return filteredNodes;
         })
     }

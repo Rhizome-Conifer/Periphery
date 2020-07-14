@@ -14,7 +14,9 @@
     "webpack-dev-server": "^3.11.0"
   },
   "scripts": {
-    "test": "jest",
+    "webpack:test": "webpack --config test/webpack.test.config.js --display-error-details",
+    "jest": "jest test/bundle.test.js",
+    "test": "npm run webpack:test && npm run jest",
     "webpack-dev-server": "webpack-dev-server",
     "dev": "webpack-dev-server --mode=development",
     "prod": "webpack --mode=production"

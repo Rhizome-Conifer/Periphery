@@ -4,12 +4,31 @@ import { cssSelector, linkQuery } from './selector';
 export class Boundary {
     constructor(boundary) {
         this.affectedNodes = [];
-        this.type = boundary.type || 'on-load';
+        if (boundary.resource === undefined || typeof boundary.resource !== 'string') {
+            throw new TypeError('Missing / incorrect resource matcher for boundary.')
+        }
+
+        if (boundary.type !== 'on-load' && boundary.type !== 'mutation-observer') {
+            throw new TypeError('Incorrect type for boundary.')
+        }
+        this.type = boundary.type;
         this.description = boundary.description || '';
 
+        if (boundary.selector === undefined) {
+            throw new TypeError('Boundary selector not provided.')
+        }
+        if (boundary.selector.type !== 'css-selector' && boundary.selector.type !== 'link-query' && boundary.selector.type !== 'element-selector') {
+            throw new TypeError('Incorrect boundary selector type.')
+        }
         this.selectorType = boundary.selector.type;
         this.selector = boundary.selector.query;
 
+        if (boundary.action === undefined) {
+            throw new TypeError('Boundary action not provided.')
+        }
+        if (boundary.action.type !== 'none' && boundary.action.type !== 'disable' && boundary.action.type !== 'style') {
+            throw new TypeError('incorrect boundary action type.')
+        }
         this.action = boundary.action.type;
         this.actionStyle = boundary.action.style;
         

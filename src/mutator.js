@@ -1,5 +1,4 @@
 import {Overlay} from './overlay';
-import { customElement } from 'lit-element';
 
 /*
     Applies an object with CSS style key-value pairs to a list of nodes.
