@@ -98,10 +98,21 @@ describe('loads boundary correctly', () => {
         return () => new _src_boundary__WEBPACK_IMPORTED_MODULE_0__["Boundary"](boundary);
     }
 
+    test('checks for boundary resource match', () => {
+        let emptyCase = initBoundary({"resource": [1,2,3]});
+        expect(emptyCase).toThrow(TypeError);
+    });
+
     test('checks for boundary type', () => {
-        let testCase = initBoundary({});
-        expect(testCase).toThrow(Error);
-    })
+        let emptyCase = initBoundary({"resource": "all"});
+        expect(emptyCase).toThrow(Error);
+    });
+
+    test('checks for boundary type', () => {
+        let emptyCase = initBoundary({"resource": "all"});
+        expect(emptyCase).toThrow(Error);
+    });
+
 });
 
 /***/ }),
@@ -119,6 +130,10 @@ __webpack_require__.r(__webpack_exports__);
 class Boundary {
     constructor(boundary) {
         this.affectedNodes = [];
+        if (boundary.resource === undefined || typeof boundary.resource !== 'string') {
+            throw new TypeError('Missing / incorrect resource matcher for boundary.')
+        }
+
         if (boundary.type !== 'on-load' && boundary.type !== 'mutation-observer') {
             throw new Error('Incorrect type for boundary.')
         }
@@ -204,8 +219,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "attachDivOverlay", function() { return attachDivOverlay; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "inlineStyle", function() { return inlineStyle; });
 /* harmony import */ var _overlay__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
-/* harmony import */ var lit_element__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
-
 
 
 /*
@@ -3755,8 +3768,6 @@ function linkQuery(node) {
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
         let allLinkPromises = [];
 
-        let t1 = window.performance.now()
-
         // Query all deduped hrefs and correspond with their in-boundary status
         allHrefsDedup.forEach(function(href) {
             allLinkPromises.push(queryResource(href)
@@ -3768,7 +3779,6 @@ function linkQuery(node) {
 
         return Promise.all(allLinkPromises).then((nodes) => {
             let allLinkResults = {};
-
             nodes.forEach(function (node) {
                 allLinkResults[node[0]] = node[1];
             })
@@ -3779,9 +3789,6 @@ function linkQuery(node) {
                     filteredNodes.push(node);
                 }
             })
-
-            let t2 = window.performance.now();
-            console.log('link query took ' + (t2 - t1) + ' ms.');
             return filteredNodes;
         })
     }

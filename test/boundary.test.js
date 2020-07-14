@@ -6,18 +6,18 @@ describe('loads boundary correctly', () => {
     }
 
     test('checks for boundary resource match', () => {
-        let emptyCase = initBoundary({});
-        expect(emptyCase).toThrow(Error);
+        let emptyCase = initBoundary({"resource": [1,2,3]});
+        expect(emptyCase).toThrow(TypeError);
     });
 
     test('checks for boundary type', () => {
         let emptyCase = initBoundary({"resource": "all"});
-        expect(emptyCase).toThrow(Error);
+        expect(emptyCase).toThrow(TypeError);
     });
 
     test('checks for boundary type', () => {
         let emptyCase = initBoundary({"resource": "all"});
-        expect(emptyCase).toThrow(Error);
+        expect(emptyCase).toThrow(TypeError);
     });
 
 });
