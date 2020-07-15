@@ -203,6 +203,13 @@ export class BoundarySidebar extends LitElement {
         this._boundaryOverlays = {};
         this.boundaryElemClasses = {};
         this.boundaryDefaultOverlays = {};
+
+        window.addEventListener("message", this.handlePostMessage, false);
+
+    }    
+    
+    handlePostMessage(msg) {
+        console.log('received message from ' + msg.origin);
     }
 
     /*
