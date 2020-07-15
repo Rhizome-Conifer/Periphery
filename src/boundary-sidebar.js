@@ -204,12 +204,20 @@ export class BoundarySidebar extends LitElement {
         this.boundaryElemClasses = {};
         this.boundaryDefaultOverlays = {};
 
-        window.addEventListener("message", this.handlePostMessage, false);
+        this.styles = {
+            visibility: 'visible'
+        }
 
+        window.addEventListener("message", this.handlePostMessage.bind(this), false);
     }    
     
     handlePostMessage(msg) {
-        console.log('received message from ' + msg.origin);
+        if (msg.origin === window.origin) {
+            if (msg.data === "hideSidebar") {
+                this.styles.visibility = 'hidden';
+                this.requestUpdate();
+            }
+        }
     }
 
     /*
@@ -314,7 +322,7 @@ export class BoundarySidebar extends LitElement {
 
     render() {
         return html`
-        <div id="sidebar-container">
+        <div id="sidebar-container" style=${styleMap(this.styles)}>
             <input type="checkbox" id="sidebar-toggle">
             <label for="sidebar-toggle" class="sidebar-toggle-icon">
                 <div class="sidebar-check">i</div>
