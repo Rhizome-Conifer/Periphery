@@ -203,6 +203,28 @@ export class BoundarySidebar extends LitElement {
         this._boundaryOverlays = {};
         this.boundaryElemClasses = {};
         this.boundaryDefaultOverlays = {};
+
+        this.styles = {};
+        this.hidden = false;
+
+        window.addEventListener("message", this.handlePostMessage.bind(this), false);
+    }    
+    
+    /*
+        Handle postMessage events from outside the iframe (framed replay mode)
+    */
+    handlePostMessage(msg) {
+        if (msg.origin === window.origin) {
+            let msgData = JSON.parse(msg.data);
+            let oldVal = this.styles;
+            if (msgData.type === 'hideSidebar') {
+                this.hidden = true;
+            }
+            if (msgData.type === 'style') {
+                this.styles = msgData.value;
+            }
+            this.requestUpdate('styles', oldVal);
+        }
     }
 
     /*
@@ -305,9 +327,26 @@ export class BoundarySidebar extends LitElement {
         `})}`;
     }
 
+    /*
+        Returns a style string based on this.styles, which can be set via postMessage 
+    */
+    getExternalStyle() {
+        let styleString = '\n';
+        Object.keys(this.styles).forEach(function (selector) {
+            let style = this.styles[selector];
+            let attributes = JSON.stringify(style).split(',').join(';\n');
+            
+            styleString += selector + ' ' + attributes.split('\"').join('');
+        }.bind(this));
+        return styleString;
+    }
+
     render() {
         return html`
-        <div id="sidebar-container">
+        <style>
+            ${this.getExternalStyle()}
+        </style>
+        <div id="sidebar-container" style=${styleMap({'visibility': this.hidden ? 'hidden' : 'visible'})}>
             <input type="checkbox" id="sidebar-toggle">
             <label for="sidebar-toggle" class="sidebar-toggle-icon">
                 <div class="sidebar-check">i</div>
