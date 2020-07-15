@@ -65,3 +65,21 @@ Boundaries must be valid JSON objects. The specification for boundaries is as fo
     "description": <boundary description>
 }]
 ```
+
+## postMessage Specification
+
+Because this module is embedded into replayed web pages, and replay systems like pywb often use "framed" replay where the page is embedded into the iframe, 
+warc-boundaries provides an interface through which to communicate with the boundaries and modify the sidebar/overlay UI. A `postMessage` message takes the 
+form of stringified JSON: 
+```
+"{"type": <type>, "value:" <value> (optional)}"
+```
+
+You can send a `postMessage` as follows:
+```
+let frame = document.querySelector('iframe');
+let msg = JSON.stringify({type: "style", value: {"#boundary-sidebar": {"background-color": "red !important"}}});
+frame.contentWindow.postMessage(msg, 'http://localhost:8080')
+```
+### hideSidebar
+
