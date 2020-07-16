@@ -39,10 +39,11 @@ export function sidebarTestRunner() {
         })
 
         afterEach(() => {
-
-        })
+            document.body.querySelector('#test-div').remove();
+            document.body.querySelector('boundary-sidebar').remove();
+        })      
     
-        test('renders boundary divs correctly', () => {
+        test('renders boundary list divs correctly', () => {
             let sidebar = document.createElement('boundary-sidebar');
             sidebar.boundaries = testBoundaries;
             document.body.appendChild(sidebar);
@@ -51,6 +52,10 @@ export function sidebarTestRunner() {
                 expect(boundaryList.children.length).toEqual(2);
             });
         });
+        
+        test('renders default overlay divs correctly', () => {
+
+        })
         
 
 
