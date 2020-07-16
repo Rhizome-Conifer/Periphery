@@ -246,8 +246,9 @@ export class BoundarySidebar extends LitElement {
         @parameter container: the sidebar container element
     */
     defaultOverlays(boundary) {
-        if (boundary.affectedNodes !== undefined) {
-            let boundaryRect = this.shadowRoot.querySelector('#boundary-sidebar').getBoundingClientRect();
+        let sidebarDiv = this.shadowRoot.querySelector('#boundary-sidebar');
+        if (boundary.affectedNodes !== undefined && sidebarDiv != null) {
+            let boundaryRect = sidebarDiv.getBoundingClientRect();
             return html`
                 ${boundary.affectedNodes.map((node) => {
                     let rect = node.getBoundingClientRect();

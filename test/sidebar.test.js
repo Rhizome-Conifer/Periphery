@@ -31,10 +31,10 @@ export function sidebarTestRunner() {
     
         test('renders boundary divs correctly', () => {
             let sidebar = document.createElement('boundary-sidebar');
+            sidebar.boundaries = testBoundaries;
             document.body.appendChild(sidebar);
-            return sidebar.updateComplete.then(() => {
-                sidebar.boundaries = testBoundaries;
-                let boundaryList = sidebar.querySelector('#boundary-list');
+            return sidebar.updateComplete.then((complete) => {
+                let boundaryList = sidebar.shadowRoot.querySelector('#boundary-list');
                 expect(boundaryList.children.length).toEqual(2);
             });
         });
