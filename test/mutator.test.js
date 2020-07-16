@@ -25,9 +25,9 @@ export function mutatorTestRunner() {
             document.body.appendChild(parent);
         });
 
-        // afterEach(() => {
-        //     document.body.querySelector('div').remove();
-        // });
+        afterEach(() => {
+            document.body.querySelector('boundary-overlay').remove();
+        });
 
         test('attach overlay with style map', () => {
             let parent = window.document.getElementById(PARENT_ID);
@@ -35,9 +35,18 @@ export function mutatorTestRunner() {
             return overlay.updateComplete.then((overlayElem) => {
                 let innerDiv = overlay.shadowRoot.querySelector('div');
                 expect(innerDiv.style.color).toEqual('red');
-
             })
         });
+
+        test('sets description text', () => {
+            let parent = window.document.getElementById(PARENT_ID);
+            let overlay = attachDivOverlay(parent, "overlay-tooltip", "test");
+            return overlay.updateComplete.then((overlayElem) => {
+                let innerDiv = overlay.shadowRoot.querySelector('div');
+                let content = window.getComputedStyle(innerDiv, ':after').getPropertyValue('content');
+                expect(content).toEqual('\"test\"');
+            })
+        })
 
     });
 }
