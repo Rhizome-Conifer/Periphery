@@ -15,7 +15,20 @@ export function sidebarTestRunner() {
                 "type": "disable"
             },
             "description": "test boundary."
-        }]
+        },
+        {
+            "resource": "all",
+            "selector": {
+                "type": "css-selector",
+                "query": "#test-div"
+            },
+            "type": "on-load",
+            "action": {
+                "type": "disable"
+            },
+            "description": "test boundary 2."
+        },
+        ]
 
         beforeEach(() => {
             let elemStyle = '{ position: absolute; top: 15px; left: 15px; width: 25px; height: 40px; }'
