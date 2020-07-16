@@ -25,15 +25,18 @@ export function mutatorTestRunner() {
             document.body.appendChild(parent);
         });
 
-        afterEach(() => {
-            document.body.querySelector('div').remove();
-        });
+        // afterEach(() => {
+        //     document.body.querySelector('div').remove();
+        // });
 
         test('attach overlay with style map', () => {
             let parent = window.document.getElementById(PARENT_ID);
-            let overlay = attachDivOverlay(parent, "test", {"color": "red"});
-            let innerDiv = overlay.shadowRoot.querySelector('div');
-            expect(innerDiv.style.color).toEqual('red');
+            let overlay = attachDivOverlay(parent, "test", "test", {"color": "red"});
+            return overlay.updateComplete.then((overlayElem) => {
+                let innerDiv = overlay.shadowRoot.querySelector('div');
+                expect(innerDiv.style.color).toEqual('red');
+
+            })
         });
 
     });
