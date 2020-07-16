@@ -15,9 +15,6 @@ export function mutatorTestRunner() {
 
     describe('overlay div correctly renders', () => {
         const PARENT_ID = 'parent';
-        const getShadowRoot = (selector) => {
-            return document.querySelector(selector).shadowRoot;
-        }
  
         beforeEach(() => {
             let parent = window.document.createElement('div');
@@ -26,7 +23,7 @@ export function mutatorTestRunner() {
         });
 
         afterEach(() => {
-            document.body.querySelector('boundary-overlay').remove();
+            document.body.querySelector('#' + PARENT_ID).remove();
         });
 
         test('attach overlay with style map', () => {
@@ -38,7 +35,7 @@ export function mutatorTestRunner() {
             })
         });
 
-        test('sets description text', () => {
+        test('sets overlay description text', () => {
             let parent = window.document.getElementById(PARENT_ID);
             let overlay = attachDivOverlay(parent, "overlay-tooltip", "test");
             return overlay.updateComplete.then((overlayElem) => {
