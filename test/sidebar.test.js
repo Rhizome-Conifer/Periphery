@@ -3,7 +3,6 @@ import { BoundarySidebar } from '../src/boundary-sidebar';
 export function sidebarTestRunner() {
     describe('renders boundary sidebar correctly', () => {
         customElements.define('boundary-sidebar', BoundarySidebar);
-        customElements.define('test-element', TestElement);
 
         const testBoundaries = [{
             "resource": "all",
@@ -32,9 +31,9 @@ export function sidebarTestRunner() {
     
         test('renders boundary divs correctly', () => {
             let sidebar = document.createElement('boundary-sidebar');
-            sidebar.boundaries = testBoundaries;
             document.body.appendChild(sidebar);
-            return sidebar.updateComplete.then((sidebar) => {
+            return sidebar.updateComplete.then(() => {
+                sidebar.boundaries = testBoundaries;
                 let boundaryList = sidebar.querySelector('#boundary-list');
                 expect(boundaryList.children.length).toEqual(2);
             });
