@@ -18,6 +18,7 @@
     "webpack:test": "webpack --config test/webpack.test.config.js --display-error-details",
     "jest": "jest test/bundle.test.js",
     "test": "npm run webpack:test && npm run jest",
+    "test:debug": "npm run webpack:test && export DEBUG_MODE=1 && npm run jest",
     "webpack-dev-server": "webpack-dev-server",
     "dev": "webpack-dev-server --mode=development",
     "prod": "webpack --mode=production"
