@@ -35,6 +35,12 @@ export function attachDivOverlay(elem, className, description, styling) {
     Builds a valid CSS style based on an object containing CSS attribuets in key-value pairs, and adds it to the DOM in a <style> element.
 */
 export function inlineStyle(node, style, selector) {
+    style.values().forEach(function(val) {
+        if (typeof val === 'array' || typeof val === 'object') {
+            throw new Error('Invalid style object. Values must be primitive data types.')
+        }
+    })
+
     let attributes = JSON.stringify(style).split(',').join(';');
     let styleString = selector + ' ' + attributes.split('\"').join('');
 

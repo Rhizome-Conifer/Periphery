@@ -9,6 +9,7 @@
   "devDependencies": {
     "html-webpack-plugin": "^4.3.0",
     "jest": "^26.1.0",
+    "jest-electron": "^0.1.11",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
@@ -17,9 +18,14 @@
     "webpack:test": "webpack --config test/webpack.test.config.js --display-error-details",
     "jest": "jest test/bundle.test.js",
     "test": "npm run webpack:test && npm run jest",
+    "test:debug": "npm run webpack:test && export DEBUG_MODE=1 && npm run jest",
     "webpack-dev-server": "webpack-dev-server",
     "dev": "webpack-dev-server --mode=development",
     "prod": "webpack --mode=production"
+  },
+  "jest": {
+    "runner": "jest-electron/runner",
+    "testEnvironment": "jest-electron/environment"
   },
   "keywords": [],
   "author": "",

@@ -79,17 +79,21 @@ export class BoundaryList {
     */
     applyBoundaries(onLoadCallback) {
         let observerBoundaries = [];
+        let runningBoundaries = [];
         // Should always apply boundaries once on DOM load, whether or not the boundary is 'observer' type or not
         this.boundaries.forEach(function (boundary) {
             if (boundary.type == 'observer') {
                 observerBoundaries.push(boundary);
             }
-            this.applyBoundary(boundary, document.body).then((boundary) => {
+            let boundaryStatus = this.applyBoundary(boundary, document.body);
+            runningBoundaries.push(boundaryStatus);
+            boundaryStatus.then((boundary) => {
                 if (onLoadCallback) {
                     onLoadCallback(boundary);
                 }
             });   
         }.bind(this));
+
     
         if (observerBoundaries.length > 0) {
             let observerOptions = {
@@ -100,6 +104,7 @@ export class BoundaryList {
             let observer = new MutationObserver(mutationCallback);
             observer.observe(document.body, observerOptions);
         }
+        return Promise.all(runningBoundaries).then(() => true);
     }
 
     /*

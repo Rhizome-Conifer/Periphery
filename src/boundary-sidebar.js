@@ -177,14 +177,15 @@ export class BoundarySidebar extends LitElement {
         return {
             boundaries: {attribute: false},
             boundaryElemClasses: {attribute: false},
-            boundaryDefaultOverlays: {attribute: false}
+            boundaryDefaultOverlays: {attribute: false},
+            boundariesApplied: {attribute: false}
         }
     }
 
     set boundaries(value) {
         let oldVal = this._boundaries;
         this._boundaries = new BoundaryList(value);
-        this._boundaries.applyBoundaries(function(boundary) {
+        this.boundariesApplied = this._boundaries.applyBoundaries(function(boundary) {
             this.boundaryElemClasses[boundary.idx].loading = false;
             this.requestUpdate();
         }.bind(this));
@@ -194,8 +195,12 @@ export class BoundarySidebar extends LitElement {
             this.boundaryElemClasses[boundary.idx] = {"boundary": true, "loading": true};
             this.boundaryDefaultOverlays[boundary.idx] = false;
         })
-        this.requestUpdate('boundaries', oldVal);
+        this.requestUpdate();
     }
+
+    applyBoundaries(callback) {
+        this.boundariesApplied = this._boundaries.applyBoundaries(callback);
+    } 
 
     constructor() {
         super();
@@ -247,8 +252,9 @@ export class BoundarySidebar extends LitElement {
         @parameter container: the sidebar container element
     */
     defaultOverlays(boundary) {
-        if (boundary.affectedNodes !== undefined) {
-            let boundaryRect = this.shadowRoot.querySelector('#boundary-sidebar').getBoundingClientRect();
+        let sidebarDiv = this.shadowRoot.querySelector('#boundary-sidebar');
+        if (boundary.affectedNodes !== undefined && sidebarDiv != null) {
+            let boundaryRect = sidebarDiv.getBoundingClientRect();
             return html`
                 ${boundary.affectedNodes.map((node) => {
                     let rect = node.getBoundingClientRect();
