@@ -177,15 +177,17 @@ export class BoundarySidebar extends LitElement {
         return {
             boundaries: {attribute: false},
             boundaryElemClasses: {attribute: false},
-            boundaryDefaultOverlays: {attribute: false}
+            boundaryDefaultOverlays: {attribute: false},
+            boundariesApplied: {attribute: false}
         }
     }
 
     set boundaries(value) {
         let oldVal = this._boundaries;
         this._boundaries = new BoundaryList(value);
-        this._boundaries.applyBoundaries(function(boundary) {
+        this.boundariesApplied = this._boundaries.applyBoundaries(function(boundary) {
             this.boundaryElemClasses[boundary.idx].loading = false;
+            this.requestUpdate();
         }.bind(this));
 
         // Set up stylng for overlay divs and UI list element
@@ -195,6 +197,10 @@ export class BoundarySidebar extends LitElement {
         })
         this.requestUpdate();
     }
+
+    applyBoundaries(callback) {
+        this.boundariesApplied = this._boundaries.applyBoundaries(callback);
+    } 
 
     constructor() {
         super();
