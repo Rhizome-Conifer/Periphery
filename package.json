@@ -4,7 +4,8 @@
   "description": "",
   "main": "src/boundary-sidebar.js",
   "dependencies": {
-    "lit-element": "^2.3.1"
+    "lit-element": "^2.3.1",
+    "workerpool": "^6.0.0"
   },
   "devDependencies": {
     "html-webpack-plugin": "^4.3.0",

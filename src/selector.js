@@ -115,6 +115,14 @@ export function linkQuery(node, _, host, endpoint) {
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
         let allLinkPromises = [];
 
+        let workers = [];
+        let maxWorkers = navigator.hardwareConcurrency || 4;
+        for (let i=0;i<maxWorkers;i++) {
+            let worker = new Worker('query-worker.js');
+            workers.push(worker);
+        }
+
+
         // Query all deduped hrefs and correspond with their in-boundary status
         allHrefsDedup.forEach(function(href) {
             allLinkPromises.push(queryResource(href, host, endpoint)
