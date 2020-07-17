@@ -1,7 +1,7 @@
 onmessage = (e) => {
     let href = e.data;
     checkCdxQueryResult(href).then((isPresent) => {
-        return isPresent;
+        return [href, isPresent];
     })
 }
 

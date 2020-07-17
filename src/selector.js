@@ -1,25 +1,19 @@
-
-/*
-    Determine whether a given backend CDX query returns a result.
-*/
-function checkCdxQueryResult(uri) {
-    return fetch(uri).then
-    (res => res.text()).then
-    (response => response != '');
-}
+import { Pool } from './worker-pool';
 
 /*
     Queries backend CDX server to determine whether a given resource exists in the archive.
     link: A Node containing the href to check
 */
-function queryResource(href) {
-    if (!href.startsWith('javascript')) {
-        let url = host + "cdx?output=json&limit=1&url=" + encodeURIComponent(href);
-        return checkCdxQueryResult(url).then(isPresent => isPresent);
-    } else {
-        // for javascript() hrefs and other things that we know aren't within boundary
-        return new Promise((resolve) => resolve(false));
-    }
+function queryResource(href, worker) {
+    return new Promise((res) => {
+        if (!href.startsWith('javascript')) {
+            let url = host + "cdx?output=json&limit=1&url=" + encodeURIComponent(href);
+            worker.onmessage = (data) => {
+                res(data);
+            }
+            worker.postMessage(url);
+        }    
+    })
 }
 
 function buildHrefListDedup(nodes) {
@@ -44,8 +38,16 @@ export function linkQuery(node) {
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
         let allLinkPromises = [];
 
+        let workers = [];
+        let maxWorkers = navigator.hardwareConcurrency || 4;
+        for (let i=0;i<maxWorkers;i++) {
+            let worker = new Worker('query-worker.js');
+            workers.push(worker);
+        }
+
+
         // Query all deduped hrefs and correspond with their in-boundary status
-        allHrefsDedup.forEach(function(href) {
+        allHrefsDedup.forEach(function(href,idx) {
             allLinkPromises.push(queryResource(href)
                 .then((isPresent) => {
                     return [href, isPresent];
