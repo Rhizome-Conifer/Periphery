@@ -25,11 +25,20 @@ sidebar.boundaries = <boundaries>;
 if you want to perform boundary DOM modification but you don't want to include the sidebar component, you can apply boundaries like so:
 
 ```
-import { BoundaryList } from 'warc-boundaries/boundar-list';
+import { BoundaryList } from 'warc-boundaries/boundary-list';
 
 let boundaries = new BoundaryList(<boundary data>)'
 boundaries.applyBoundaries();
 ```
+
+## Attributes
+
+**hidden:** hides the sidebar UI. Boundaries will still be applied and the DOM of the replayed
+resource will still be modified.
+
+**post-message-origin:** Specifies the origin from which to accept postMessage messages (see the postMessage section below for more information). 
+By default, the sidebar only accepts `postMessage`s from the same origin, so if the replayed page is contained in an `iframe` with a different origin,
+`post-message-origin` must be set in order for the component to accept messages.
 
 ## Boundary Spec
 
@@ -82,4 +91,13 @@ let msg = JSON.stringify({type: "style", value: {"#boundary-sidebar": {"backgrou
 frame.contentWindow.postMessage(msg, 'http://localhost:8080')
 ```
 ### hideSidebar
+
+messages with a `type` of `hideSidebar` do not require a `value`, and will hide the sidebar.
+This allows you to still apply boundaries without showing the sidebar and metadata.
+
+### styles
+
+Messages with a `type` of `styles` allow you to apply custom styling and appearance to the sidebar.
+The styles should be formatted with the keys as strings representing valid CSS selectors, and the values
+as objects with keys representing CSS attributes and values as CSS attribute values, as in the above example.
 

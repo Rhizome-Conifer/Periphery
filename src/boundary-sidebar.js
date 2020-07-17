@@ -178,7 +178,9 @@ export class BoundarySidebar extends LitElement {
             boundaries: {attribute: false},
             boundaryElemClasses: {attribute: false},
             boundaryDefaultOverlays: {attribute: false},
-            boundariesApplied: {attribute: false}
+            boundariesApplied: {attribute: false},
+            hidden: {attribute: true},
+            postMessageOrigin: {attribute: 'post-message-origin'}
         }
     }
 
@@ -211,6 +213,7 @@ export class BoundarySidebar extends LitElement {
 
         this.styles = {};
         this.hidden = false;
+        this.postMessageOrigin = window.origin;
 
         window.addEventListener("message", this.handlePostMessage.bind(this), false);
     }    
@@ -219,7 +222,8 @@ export class BoundarySidebar extends LitElement {
         Handle postMessage events from outside the iframe (framed replay mode)
     */
     handlePostMessage(msg) {
-        if (msg.origin === window.origin) {
+        console.log(this.postMessageOrigin);
+        if (msg.origin === this.postMessageOrigin) {
             let msgData = JSON.parse(msg.data);
             let oldVal = this.styles;
             if (msgData.type === 'hideSidebar') {
