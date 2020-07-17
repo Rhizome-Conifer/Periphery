@@ -56,13 +56,11 @@ export function sidebarTestRunner() {
         test('renders default overlay divs correctly', () => {
             let sidebar = document.createElement('boundary-sidebar');
             document.body.appendChild(sidebar);
-            return sidebar.updateComplete.then(() => {
-                sidebar.boundaries = testBoundaries;
-                return sidebar.boundariesApplied.then(() => {
-                    let overlayRoot = sidebar.shadowRoot.querySelector('.overlay-root');
-                    let overlay = overlayRoot.children[0];
-                    expect(overlay.shadowRoot.children[0].style.width).toEqual('25px');        
-                })
+            sidebar.boundaries = testBoundaries;
+            return Promise.all([sidebar.updateComplete, sidebar.boundariesApplied]).then(() => {
+                let overlayRoot = sidebar.shadowRoot.querySelector('.overlay-root');
+                let overlay = overlayRoot.children[0];
+                expect(overlay.shadowRoot.children[0].style.width).toEqual('25px');        
             })
         })
         
