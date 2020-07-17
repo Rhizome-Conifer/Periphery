@@ -178,7 +178,7 @@ export class BoundarySidebar extends LitElement {
             boundaries: {attribute: false},
             boundaryElemClasses: {attribute: false},
             boundaryDefaultOverlays: {attribute: false},
-            boundariesApplied: {attribute: false}
+            boundariesApplied: {attribute: false},
             hidden: {attribute: true},
             postMessageOrigin: {attribute: 'post-message-origin'}
         }
