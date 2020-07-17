@@ -2,6 +2,7 @@ import { BoundarySidebar } from '../src/boundary-sidebar';
 
 export function sidebarTestRunner() {
     describe('renders boundary sidebar correctly', () => {
+        const TEST_ID = 'test-div';
         customElements.define('boundary-sidebar', BoundarySidebar);
         const testBoundaries = [{
             "resource": "all",
@@ -32,9 +33,8 @@ export function sidebarTestRunner() {
         beforeEach(() => {
             let elemStyle = 'position: absolute; top: 15px; left: 15px; width: 25px; height: 40px;'
             let testElem = document.createElement('div');
-            testElem.id = 'test-div';
+            testElem.id = TEST_ID;
             testElem.style.cssText = elemStyle;
-            console.log(testElem.style)
             document.body.appendChild(testElem);
         })
 
@@ -60,7 +60,18 @@ export function sidebarTestRunner() {
             return Promise.all([sidebar.updateComplete, sidebar.boundariesApplied]).then(() => {
                 let overlayRoot = sidebar.shadowRoot.querySelector('.overlay-root');
                 let overlay = overlayRoot.children[0];
-                expect(overlay.shadowRoot.children[0].style.width).toEqual('25px');        
+                expect(overlay.shadowRoot.children[0].style.width).toEqual('25px');    
+                expect(overlay.shadowRoot.children[0].style.height).toEqual('40px');    
+            })
+        });
+
+        test('applies boundary and styles matching divs correctly', () => {
+            let sidebar = document.createElement('boundary-sidebar');
+            document.body.appendChild(sidebar);
+            sidebar.boundaries = testBoundaries;
+            return Promise.all([sidebar.updateComplete, sidebar.boundariesApplied]).then(() => {
+                let testDiv = document.querySelector('#' + TEST_ID);
+                expect(testDiv.style.pointerEvents).toEqual('none');    
             })
         })
         
