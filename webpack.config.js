@@ -10,5 +10,13 @@ module.exports = {
     },
     plugins: [
         new HtmlWebPackPlugin()
-    ]
+    ],
+    module: {
+        rules: [
+            {
+                test: /\.worker\.js$/,
+                use: { loader: 'worker-loader' },
+            }
+        ]
+    }
 };

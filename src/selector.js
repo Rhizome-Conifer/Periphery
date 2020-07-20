@@ -1,20 +1,21 @@
 import { Pool } from './worker-pool';
+import Worker from './query-worker.js';
 
 /*
     Queries backend CDX server to determine whether a given resource exists in the archive.
     link: A Node containing the href to check
 */
-function queryResource(href, worker) {
-    return new Promise((res) => {
-        if (!href.startsWith('javascript')) {
-            let url = host + "cdx?output=json&limit=1&url=" + encodeURIComponent(href);
-            worker.onmessage = (data) => {
-                res(data);
-            }
-            worker.postMessage(url);
-        }    
-    })
-}
+// function queryResource(href, worker) {
+//     return new Promise((res) => {
+//         if (!href.startsWith('javascript')) {
+//             let url = host + "cdx?output=json&limit=1&url=" + encodeURIComponent(href);
+//             worker.onmessage = (data) => {
+//                 res(data);
+//             }
+//             worker.postMessage(url);
+//         }    
+//     })
+// }
 
 function buildHrefListDedup(nodes) {
     let allHref = [];
@@ -36,26 +37,23 @@ export function linkQuery(node) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
-        let allLinkPromises = [];
 
-        let workers = [];
-        let maxWorkers = navigator.hardwareConcurrency || 4;
-        for (let i=0;i<maxWorkers;i++) {
-            let worker = new Worker('query-worker.js');
-            workers.push(worker);
-        }
+        let pool = new Pool(4, './query-worker.js');
+        let allLinkPromises = pool.processInput(allHrefsDedup);
+        console.log(window.Worker);
+        console.log(Worker);
 
+        // // Query all deduped hrefs and correspond with their in-boundary status
+        // allHrefsDedup.forEach(function(href,idx) {
+        //     allLinkPromises.push(queryResource(href)
+        //         .then((isPresent) => {
+        //             return [href, isPresent];
+        //         })
+        //     );
+        // }); 
 
-        // Query all deduped hrefs and correspond with their in-boundary status
-        allHrefsDedup.forEach(function(href,idx) {
-            allLinkPromises.push(queryResource(href)
-                .then((isPresent) => {
-                    return [href, isPresent];
-                })
-            );
-        }); 
-
-        return Promise.all(allLinkPromises).then((nodes) => {
+        return allLinkPromises.then((nodes) => {
+            console.log(nodes);
             let allLinkResults = {};
             nodes.forEach(function (node) {
                 allLinkResults[node[0]] = node[1];
