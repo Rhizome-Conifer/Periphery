@@ -56,7 +56,7 @@ export class BoundaryList {
         if (boundary.action == 'inline-style') {
             matchedNodes = inlineStyle(document.head, boundary.actionStyle, boundary.selector);
         } else {
-            matchedNodes = selectorFuncs[boundary.selectorType](node, boundary.selector).then(function(nodes) {
+            matchedNodes = selectorFuncs[boundary.selectorType](node, boundary).then(function(nodes) {
             if (boundary.action == 'disable') {
                     boundary.actionStyle = {'pointer-events': 'none'};
                 }
