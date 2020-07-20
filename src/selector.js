@@ -1,5 +1,4 @@
 import { Pool } from './worker-pool';
-import Worker from './query-worker.js';
 
 /*
     Queries backend CDX server to determine whether a given resource exists in the archive.
@@ -38,10 +37,8 @@ export function linkQuery(node) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
 
-        let pool = new Pool(4, './query-worker.js');
+        let pool = new Pool(4);
         let allLinkPromises = pool.processInput(allHrefsDedup);
-        console.log(window.Worker);
-        console.log(Worker);
 
         // // Query all deduped hrefs and correspond with their in-boundary status
         // allHrefsDedup.forEach(function(href,idx) {
