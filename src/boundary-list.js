@@ -18,7 +18,7 @@ export class BoundaryList {
         Creates elements corresponding to a boundary's overlays.
         @param boundary: the given Boundary object.
     */
-   createOverlays(boundary) {
+   createOverlays(nodes, boundary) {
         if (boundary.overlayDivs == undefined) {
             boundary.overlayDivs = {};
         }
@@ -29,7 +29,7 @@ export class BoundaryList {
             let desc = overlay.type == 'tooltip' ? boundary.description : null;
             boundary.overlayDivs[overlayId] = [];
 
-            boundary.affectedNodes.forEach(function (node) {
+            nodes.forEach(function (node) {
                 let overlayDiv = attachDivOverlay(node, className, desc, overlay.styles);
                 boundary.overlayDivs[overlayId].push(overlayDiv);
                 node.style.position = 'relative';
@@ -73,7 +73,7 @@ export class BoundaryList {
         return matchedNodes.then(function(nodes) {
             boundary.pushAddedNodes(nodes);
             if (boundary.overlays !== undefined) {
-                this.createOverlays(boundary);
+                this.createOverlays(matchedNodes, boundary);
             }
             return boundary;
         }.bind(this));    
@@ -92,6 +92,9 @@ export class BoundaryList {
                     console.log(node);
                     this.performBoundaryAction([node], boundary);
                     boundary.pushAddedNodes([node]);
+                    if (boundary.overlays !== undefined) {
+                        this.createOverlays([node], boundary);
+                    }
                 }.bind(this));
                 onLoadCallback(boundary);
             } else {

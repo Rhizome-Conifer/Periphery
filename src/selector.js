@@ -8,6 +8,7 @@ class IntersectionElement {
 
     intersectionCallback(entries) {
         let elem = entries[0];
+        // If there is no intersection
         if (elem.intersectionRatio <= 0) return;
     
         let href = elem.target.href;
@@ -23,7 +24,7 @@ class IntersectionElement {
                 }
             })
         }
-        if (this.unobserveCallback !==null) {
+        if (this.unobserveCallback !== null) {
             this.unobserveCallback(elem.target);
         } 
     }    

@@ -13,7 +13,7 @@ export class Overlay extends LitElement {
             left: 0;
             right: 0;
             background-color: rgba(0,0,0,0.5);
-            z-index: -1;
+            z-index: 9998;
             pointer-events: none;
         }
 
