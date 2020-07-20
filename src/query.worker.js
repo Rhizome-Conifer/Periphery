@@ -1,8 +1,8 @@
-// function checkCdxQueryResult(uri) {
-//     return fetch(uri).then
-//     (res => res.text()).then
-//     (response => response != '');
-// }
+function checkCdxQueryResult(uri) {
+    return fetch(uri).then
+    (res => res.text()).then
+    (response => response != '');
+}
 
 onmessage = function(e) {
     console.log('received message');
