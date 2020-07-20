@@ -20,6 +20,7 @@ function getLinkQueryCallback(queryResults, otherCallback) {
             } else {
                 queryResource(href).then((isPresent) => {
                     queryResults[href] = isPresent;
+                    console.log
                     if (!isPresent) {
                         otherCallback(elem);
                     }

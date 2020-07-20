@@ -73,9 +73,8 @@ export class BoundaryList {
         }
         // Update the list of added nodes, and attach overlays if applicable
         return matchedNodes.then(function(nodes) {
-            boundary.pushAddedNodes(nodes);
             if (boundary.overlays !== undefined) {
-                this.createOverlays(matchedNodes, boundary);
+                this.createOverlays(nodes, boundary);
             }
             return boundary;
         }.bind(this));    
@@ -91,6 +90,7 @@ export class BoundaryList {
         this.boundaries.forEach(function (boundary) {
             if (boundary.selectorType === 'link-query-lazy') {
                 linkQueryLazy(boundary, document.body, function(node) {
+                    console.log('test');
                     console.log(node);
                     this.performBoundaryAction([node], boundary);
                     boundary.pushAddedNodes([node]);
