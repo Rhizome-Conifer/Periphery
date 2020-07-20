@@ -92,7 +92,8 @@ export class BoundaryList {
                     console.log(node);
                     this.performBoundaryAction([node], boundary);
                     boundary.pushAddedNodes([node]);
-                }.bind(this))
+                }.bind(this));
+                onLoadCallback(boundary);
             } else {
                 if (boundary.type == 'observer') {
                     observerBoundaries.push(boundary);
