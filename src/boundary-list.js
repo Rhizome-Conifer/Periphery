@@ -43,7 +43,7 @@ export class BoundaryList {
         });
     }
 
-    performBoundaryAction(boundary, nodes) {
+    performBoundaryAction(nodes, boundary) {
         if (boundary.action == 'disable') {
             boundary.actionStyle = {'pointer-events': 'none'};
         }
@@ -56,7 +56,7 @@ export class BoundaryList {
         @param boundary: the given Boundary object
         @param node: the root DOM node from which to apply the boundary
     */
-    applyBoundary(boundary, node) {
+    applyBoundary(node, boundary) {
         let selectorFuncs = {
             'css-selector': cssSelector,
             'link-query': linkQuery
@@ -66,17 +66,8 @@ export class BoundaryList {
         if (boundary.action == 'inline-style') {
             matchedNodes = inlineStyle(document.head, boundary.actionStyle, boundary.selector);
         } else {
-<<<<<<< HEAD
             matchedNodes = selectorFuncs[boundary.selectorType](node, boundary.selector, this.host, this.cdxEndpoint).then(function(nodes) {
-            if (boundary.action == 'disable') {
-                    boundary.actionStyle = {'pointer-events': 'none'};
-                }
-                applyStylesToNodes(nodes, boundary.actionStyle);
-                return nodes;
-=======
-            matchedNodes = selectorFuncs[boundary.selectorType](node, boundary).then(function(nodes) {
-                this.performBoundaryAction(boundary, nodes);
->>>>>>> Adding correct styling on lazy link query
+                return this.performBoundaryAction(nodes, boundary);
             }.bind(this));
         }
         // Update the list of added nodes, and attach overlays if applicable
@@ -98,22 +89,23 @@ export class BoundaryList {
         // Should always apply boundaries once on DOM load, whether or not the boundary is 'observer' type or not
         this.boundaries.forEach(function (boundary) {
             if (boundary.selectorType === 'link-query-lazy') {
-                linkQueryLazy(document.body, boundary, function(node) {
+                linkQueryLazy(boundary, document.body, function(node) {
                     console.log(node);
-                    performBoundaryAction(boundary, node);
-                    boundary.pushAddedNodes(node);
-                })
-            }
-            if (boundary.type == 'observer') {
-                observerBoundaries.push(boundary);
-            }
-            let boundaryStatus = this.applyBoundary(boundary, document.body);
-            runningBoundaries.push(boundaryStatus);
-            boundaryStatus.then((boundary) => {
-                if (onLoadCallback) {
-                    onLoadCallback(boundary);
+                    this.performBoundaryAction([node], boundary);
+                    boundary.pushAddedNodes([node]);
+                }.bind(this))
+            } else {
+                if (boundary.type == 'observer') {
+                    observerBoundaries.push(boundary);
                 }
-            });   
+                let boundaryStatus = this.applyBoundary(document.body, boundary);
+                runningBoundaries.push(boundaryStatus);
+                boundaryStatus.then((boundary) => {
+                    if (onLoadCallback) {
+                        onLoadCallback(boundary);
+                    }
+                });       
+            }
         }.bind(this));
 
     
@@ -140,7 +132,7 @@ export class BoundaryList {
                     // To all added nodes, apply any applicable boundaries
                     mutation.addedNodes.forEach(function (node) {
                         observerBoundaries.forEach(function(boundary) {
-                            this.applyBoundary(boundary, node);
+                            this.applyBoundary(node, boundary);
                         }.bind(this));
                     });
                                         
