@@ -1,4 +1,3 @@
-import Worker from 'worker-loader!./query.worker.js';
 
 export class Pool {
     constructor(size, script) {
@@ -49,13 +48,11 @@ export class Pool {
 
 class WorkerThread {
     constructor(freeThread) {
-        console.log(Worker);
-        this.worker = new Worker();
+        this.worker = new Worker('query.worker.js', { type: 'module' });
         this.freeThread = freeThread;
     }
 
     run(task) {
-        console.log(task.message)
         // console.log(this.worker.onmessage)
         this.worker.onmessage = (val) => {
             console.log(val);

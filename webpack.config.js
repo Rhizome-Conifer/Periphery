@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebPackPlugin = require( 'html-webpack-plugin' );
+const WorkerPlugin = require('worker-plugin');
 
 module.exports = {
     context: __dirname,
@@ -9,14 +10,7 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
     },
     plugins: [
-        new HtmlWebPackPlugin()
-    ],
-    module: {
-        rules: [
-            {
-                test: /\.worker\.js$/,
-                use: { loader: 'worker-loader' },
-            }
-        ]
-    }
+        new HtmlWebPackPlugin(),
+        new WorkerPlugin()
+    ]
 };
