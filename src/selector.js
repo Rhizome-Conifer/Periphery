@@ -113,15 +113,11 @@ export function linkQuery(node, _, host, endpoint) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
-        let allLinkPromises = [];
 
-        let workers = [];
-        let maxWorkers = navigator.hardwareConcurrency || 4;
-        for (let i=0;i<maxWorkers;i++) {
-            let worker = new Worker('query-worker.js');
-            workers.push(worker);
-        }
-
+        let pool = new Pool(4, './query-worker.js');
+        let allLinkPromises = pool.processInput(allHrefsDedup);
+        console.log(window.Worker);
+        console.log(Worker);
 
         // Query all deduped hrefs and correspond with their in-boundary status
         allHrefsDedup.forEach(function(href) {
@@ -132,7 +128,8 @@ export function linkQuery(node, _, host, endpoint) {
             );
         }); 
 
-        return Promise.all(allLinkPromises).then((nodes) => {
+        return allLinkPromises.then((nodes) => {
+            console.log(nodes);
             let allLinkResults = {};
             nodes.forEach(function (node) {
                 allLinkResults[node[0]] = node[1];

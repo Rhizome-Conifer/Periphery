@@ -1,3 +1,5 @@
+import Worker from './query-worker.js';
+
 export class Pool {
     constructor(size, script) {
         this.size = size;
@@ -21,9 +23,9 @@ export class Pool {
                 this.addTask(val, function(res) {
                     resolve(res);
                 })
-            }))
-        })    
-        return Promise.all(tasks).then((vals) => vals);
+            }.bind(this)))
+        }.bind(this));
+        return Promise.all(tasks).then((vals) => {console.log(vals); return vals});
     }
 
     addTask(msg, callback) {
@@ -47,21 +49,25 @@ export class Pool {
 
 class WorkerThread {
     constructor(script, freeThread) {
-        this.worker = new Worker(script);
+        console.log(script);
+        this.worker = new Worker();
         this.freeThread = freeThread;
     }
 
     run(task) {
-        this.worker.onmessage = (msg) => {
-            task.callback(msg);
-            this.freeThread(this);
-            this.worker.terminate();
-        }
+        // console.log(task.message)
+        // console.log(this.worker.onmessage)
+        // this.worker.onmessage = (val) => {
+        //     console.log(val);
+        //     task.callback(val);
+        //     this.freeThread(this);
+        // }
+        console.log(this.worker);
         this.worker.postMessage(task.message);
     }
 }
 
 function WorkerTask(msg, callback) {
-    this.msg = msg;
+    this.message = msg;
     this.callback = callback;
 }
