@@ -5,23 +5,51 @@ class IntersectionElement {
         this.unobserveCallback = null;
     }
 
-    intersectionCallback(entries) {
+    intersectionCallback(entries, onQueryCallback) {
         let elem = entries[0];
         if (elem.intersectionRatio <= 0) return;
-        console.log('observed');
     
         let href = elem.target.href;
         if (this.hrefs[href] !== undefined) {
+            if (this.hrefs[href] === false) {
+                onQueryCallback(elem.target);
+            }
         } else {
             queryResource(href).then((isPresent) => {
                 this.hrefs[href] = isPresent;
+                if (!isPresent) {
+                    onQueryCallback(elem.target);
+                }
             })
         }
-        if (this.unobserveCallback !== null) {
+        if (this.unobserveCallback !==null) {
             this.unobserveCallback(elem.target);
-        }
+        } 
     }    
 }
+
+/*
+    Uses an IntersectionObserver to perform link queries on elements only as they are loaded into view.
+*/
+
+export function linkQueryLazy(node, boundary, callback) {
+    if (node && node.nodeType === Node.ELEMENT_NODE) {
+        let allHrefNodes = node.querySelectorAll('[href]');
+        let allLinkResults = {};
+
+
+        console.log(allHrefNodes.length)
+        allHrefNodes.forEach(function(node) {
+            let intersectionElem = new IntersectionElement(boundary, allLinkResults, callback);
+            let observer = new IntersectionObserver(intersectionElem.intersectionCallback.bind(intersectionElem));
+            intersectionElem.unobserveCallback = () => {
+                observer.disconnect();
+            }
+            observer.observe(node);
+        })
+    }
+}
+
 
 /*
     Determine whether a given backend CDX query returns a result.
@@ -60,35 +88,9 @@ function buildHrefListDedup(nodes) {
 }
 
 /*
-    > push all [href] query matching nodes to a list of nodes to query
-    > Create deduped list of hrefs
-    > on intersection:
-        > if href has already been queried, return result and unobserve target
-        > else, query node link
-*/
-
-export function linkQuery(node, boundary) {
-    if (node && node.nodeType === Node.ELEMENT_NODE) {
-        let allHrefNodes = node.querySelectorAll('[href]');
-        let allLinkResults = {};
-
-
-        console.log(allHrefNodes.length)
-        allHrefNodes.forEach(function(node) {
-            let intersectionElem = new IntersectionElement(boundary, allLinkResults);
-            let observer = new IntersectionObserver(intersectionElem.intersectionCallback.bind(intersectionElem));
-            intersectionElem.unobserveCallback = (elem) => {
-                observer.disconnect();
-            }
-            observer.observe(node);
-        })
-    }
-}
-
-/*
     Selects all elements with href attribute and queries whether they point to an in-boundary resource
 */
-export function linkQuery(node, boundary) {
+export function linkQuery(node, _) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
