@@ -65,16 +65,14 @@ export class BoundaryList {
         if (boundary.action == 'inline-style') {
             matchedNodes = inlineStyle(document.head, boundary.actionStyle, boundary.selector);
         } else {
-            console.log(selectorFuncs[boundary.selectorType](node, boundary));
             matchedNodes = selectorFuncs[boundary.selectorType](node, boundary).then(function(nodes) {
                 return this.performBoundaryAction(nodes, boundary);
             }.bind(this));
         }
         // Update the list of added nodes, and attach overlays if applicable
         return matchedNodes.then(function(nodes) {
-            boundary.pushAddedNodes(nodes);
             if (boundary.overlays !== undefined) {
-                this.createOverlays(matchedNodes, boundary);
+                this.createOverlays(nodes, boundary);
             }
             return boundary;
         }.bind(this));    
@@ -90,6 +88,7 @@ export class BoundaryList {
         this.boundaries.forEach(function (boundary) {
             if (boundary.selectorType === 'link-query-lazy') {
                 linkQueryLazy(boundary, document.body, function(node) {
+                    console.log('test');
                     console.log(node);
                     this.performBoundaryAction([node], boundary);
                     boundary.pushAddedNodes([node]);
