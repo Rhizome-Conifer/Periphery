@@ -190,13 +190,20 @@ export class BoundarySidebar extends LitElement {
         let oldVal = this._boundaries;
         this._boundaries = new BoundaryList(value, this.hostPrefix, this.cdxEndpoint);
         this.boundariesApplied = this._boundaries.applyBoundaries(function(boundary) {
+            if (this.boundaryElemClasses[boundary.idx] === undefined) {
+                this.boundaryElemClasses[boundary.idx] = {};
+            }
             this.boundaryElemClasses[boundary.idx].loading = false;
+            console.log(this.boundaryElemClasses)
             this.requestUpdate();
         }.bind(this));
 
         // Set up stylng for overlay divs and UI list element
         this._boundaries.boundaries.forEach((boundary) => {
-            this.boundaryElemClasses[boundary.idx] = {"boundary": true, "loading": true};
+            if (this.boundaryElemClasses[boundary.idx] === undefined) {
+                this.boundaryElemClasses[boundary.idx] = {"loading": true}
+            }
+            this.boundaryElemClasses[boundary.idx].boundary = true;
             this.boundaryDefaultOverlays[boundary.idx] = false;
         })
         this.requestUpdate();
