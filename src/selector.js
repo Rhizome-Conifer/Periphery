@@ -1,52 +1,52 @@
-class IntersectionElement {
-    constructor(boundary, hrefs, callback) {
-        this.boundary = boundary;
-        this.hrefs = hrefs;
-        this.unobserveCallback = null;
-        this.callback = callback;
-    }
-
-    intersectionCallback(entries) {
+function getIntersectionCallback(callback, unobserveCallback) {
+    return function(entries) {
         let elem = entries[0];
-        // If there is no intersection
-        if (elem.intersectionRatio <= 0) return;
-    
-        let href = elem.target.href;
-        if (this.hrefs[href] !== undefined) {
-            if (this.hrefs[href] === false) {
-                this.callback(elem.target);
-            }
-        } else {
-            queryResource(href).then((isPresent) => {
-                this.hrefs[href] = isPresent;
-                if (!isPresent) {
-                    this.callback(elem.target);
-                }
-            })
+        // If there is no intersection, do nothing
+        if (elem.intersectionRatio > 0) {
+            callback(elem.target);
+            unobserveCallback(elem.target);
         }
-        if (this.unobserveCallback !== null) {
-            this.unobserveCallback(elem.target);
-        } 
-    }    
+    }
+}
+
+function getLinkQueryCallback(queryResults, otherCallback) {
+    return function(elem) {
+        if (elem.href !== undefined) {
+            let href = elem.href;
+            if (queryResults[href] !== undefined) {
+                if (queryResults[href] === false) {
+                    otherCallback(elem);
+                }
+            } else {
+                queryResource(href).then((isPresent) => {
+                    queryResults[href] = isPresent;
+                    if (!isPresent) {
+                        otherCallback(elem);
+                    }
+                })
+            }
+        }
+    }
 }
 
 /*
     Uses an IntersectionObserver to perform link queries on elements only as they are loaded into view.
+    @param boundary: the Boundary being applied
+    @param node: the root HTML element from which to query
+    @param callback: the function to be called with intersected elements to be passed into
 */
-
 export function linkQueryLazy(boundary, node, callback) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allLinkResults = {};
+        let queryCallback = getLinkQueryCallback(allLinkResults, callback);
 
-
-        console.log(allHrefNodes.length)
         allHrefNodes.forEach(function(node) {
-            let intersectionElem = new IntersectionElement(boundary, allLinkResults, callback);
-            let observer = new IntersectionObserver(intersectionElem.intersectionCallback.bind(intersectionElem));
-            intersectionElem.unobserveCallback = () => {
+            let observer;
+            let unobserveCallback = () => {
                 observer.disconnect();
             }
+            observer = new IntersectionObserver(getIntersectionCallback(queryCallback, unobserveCallback));
             observer.observe(node);
         })
     }

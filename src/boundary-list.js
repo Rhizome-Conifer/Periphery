@@ -31,6 +31,7 @@ export class BoundaryList {
             let desc = overlay.type == 'tooltip' ? boundary.description : null;
             boundary.overlayDivs[overlayId] = [];
 
+            console.log(nodes);
             nodes.forEach(function (node) {
                 let overlayDiv = attachDivOverlay(node, className, desc, overlay.styles);
                 boundary.overlayDivs[overlayId].push(overlayDiv);
