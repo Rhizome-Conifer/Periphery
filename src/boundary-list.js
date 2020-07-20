@@ -1,5 +1,5 @@
 import { Boundary } from './boundary';
-import { cssSelector, linkQuery } from './selector';
+import { cssSelector, linkQuery, linkQueryLazy } from './selector';
 import { applyStylesToNodes, attachDivOverlay } from './mutator';
 
 export class BoundaryList {
@@ -43,6 +43,14 @@ export class BoundaryList {
         });
     }
 
+    performBoundaryAction(boundary, nodes) {
+        if (boundary.action == 'disable') {
+            boundary.actionStyle = {'pointer-events': 'none'};
+        }
+        applyStylesToNodes(nodes, boundary.actionStyle);
+        return nodes;
+    }
+
     /*
         Apply a given boundary, performing the relevant DOM modifications.
         @param boundary: the given Boundary object
@@ -58,12 +66,17 @@ export class BoundaryList {
         if (boundary.action == 'inline-style') {
             matchedNodes = inlineStyle(document.head, boundary.actionStyle, boundary.selector);
         } else {
+<<<<<<< HEAD
             matchedNodes = selectorFuncs[boundary.selectorType](node, boundary.selector, this.host, this.cdxEndpoint).then(function(nodes) {
             if (boundary.action == 'disable') {
                     boundary.actionStyle = {'pointer-events': 'none'};
                 }
                 applyStylesToNodes(nodes, boundary.actionStyle);
                 return nodes;
+=======
+            matchedNodes = selectorFuncs[boundary.selectorType](node, boundary).then(function(nodes) {
+                this.performBoundaryAction(boundary, nodes);
+>>>>>>> Adding correct styling on lazy link query
             }.bind(this));
         }
         // Update the list of added nodes, and attach overlays if applicable
@@ -84,6 +97,13 @@ export class BoundaryList {
         let runningBoundaries = [];
         // Should always apply boundaries once on DOM load, whether or not the boundary is 'observer' type or not
         this.boundaries.forEach(function (boundary) {
+            if (boundary.selectorType === 'link-query-lazy') {
+                linkQueryLazy(document.body, boundary, function(node) {
+                    console.log(node);
+                    performBoundaryAction(boundary, node);
+                    boundary.pushAddedNodes(node);
+                })
+            }
             if (boundary.type == 'observer') {
                 observerBoundaries.push(boundary);
             }
