@@ -17,7 +17,7 @@ export class Boundary {
         if (boundary.selector === undefined) {
             throw new TypeError('Boundary selector not provided.')
         }
-        if (boundary.selector.type !== 'css-selector' && boundary.selector.type !== 'link-query' && boundary.selector.type !== 'element-selector') {
+        if (boundary.selector.type !== 'css-selector' && boundary.selector.type !== 'link-query' && boundary.selector.type !== 'link-query-lazy') {
             throw new TypeError('Incorrect boundary selector type.')
         }
         this.selectorType = boundary.selector.type;

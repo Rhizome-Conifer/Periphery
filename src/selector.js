@@ -1,24 +1,25 @@
 class IntersectionElement {
-    constructor(boundary, hrefs, presentCallback) {
+    constructor(boundary, hrefs, callback) {
         this.boundary = boundary;
         this.hrefs = hrefs;
         this.unobserveCallback = null;
+        this.callback = callback;
     }
 
-    intersectionCallback(entries, onQueryCallback) {
+    intersectionCallback(entries) {
         let elem = entries[0];
         if (elem.intersectionRatio <= 0) return;
     
         let href = elem.target.href;
         if (this.hrefs[href] !== undefined) {
             if (this.hrefs[href] === false) {
-                onQueryCallback(elem.target);
+                this.callback(elem.target);
             }
         } else {
             queryResource(href).then((isPresent) => {
                 this.hrefs[href] = isPresent;
                 if (!isPresent) {
-                    onQueryCallback(elem.target);
+                    this.callback(elem.target);
                 }
             })
         }
@@ -32,7 +33,7 @@ class IntersectionElement {
     Uses an IntersectionObserver to perform link queries on elements only as they are loaded into view.
 */
 
-export function linkQueryLazy(node, boundary, callback) {
+export function linkQueryLazy(boundary, node, callback) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allLinkResults = {};
@@ -90,7 +91,7 @@ function buildHrefListDedup(nodes) {
 /*
     Selects all elements with href attribute and queries whether they point to an in-boundary resource
 */
-export function linkQuery(node, _) {
+export function linkQuery(node, boundary) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
