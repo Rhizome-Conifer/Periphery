@@ -35,6 +35,41 @@ function buildHrefListDedup(nodes) {
     return allHrefDedup;
 }
 
+class IntersectionElement {
+    constructor(boundary, hrefs) {
+        this.boundary = boundary;
+        this.hrefs = hrefs;
+        this.unobserveCallback = null;
+    }
+
+    intersectionCallback(entries) {
+        let elem = entries[0];
+        if (elem.intersectionRatio <= 0) return;
+        console.log('observed');
+    
+        let href = elem.target.href;
+        if (this.hrefs[href] !== undefined) {
+        } else {
+            queryResource(href).then((isPresent) => {
+                this.hrefs[href] = isPresent;
+            })
+        }
+        if (this.unobserveCallback !== null) {
+            this.unobserveCallback(elem.target);
+        }
+    }    
+}
+
+
+/*
+    > push all [href] query matching nodes to a list of nodes to query
+    > Create deduped list of hrefs
+    > on intersection:
+        > if href has already been queried, return result and unobserve target
+        > else, query node link
+*/
+
+
 /*
     Selects all elements with href attribute and queries whether they point to an in-boundary resource
 */
@@ -43,33 +78,47 @@ export function linkQuery(node, _, host, endpoint) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
         let allLinkPromises = [];
+        let allLinkResults = {};
+
+
+        console.log(allHrefNodes.length)
+        allHrefNodes.forEach(function(node) {
+            let intersectionElem = new IntersectionElement(boundary, allLinkResults);
+            let observer = new IntersectionObserver(intersectionElem.intersectionCallback.bind(intersectionElem));
+            intersectionElem.unobserveCallback = (elem) => {
+                observer.unobserve(elem);
+            }
+            observer.observe(node);
+        })
 
         // Query all deduped hrefs and correspond with their in-boundary status
-        allHrefsDedup.forEach(function(href) {
-            allLinkPromises.push(queryResource(href, host, endpoint)
-                .then((isPresent) => {
-                    return [href, isPresent];
-                })
-            );
-        }); 
+        // allHrefsDedup.forEach(function(href) {
+        //     allLinkPromises.push(queryResource(href)
+        //         .then((isPresent) => {
+        //             return [href, isPresent];
+        //         })
+        //     );
+        // }); 
 
-        return Promise.all(allLinkPromises).then((nodes) => {
-            let allLinkResults = {};
-            nodes.forEach(function (node) {
-                allLinkResults[node[0]] = node[1];
-            })
+        // return Promise.all(allLinkPromises).then((nodes) => {
+        //     let allLinkResults = {};
+        //     nodes.forEach(function (node) {
+        //         allLinkResults[node[0]] = node[1];
+        //     })
 
-            let filteredNodes = [];
-            allHrefNodes.forEach(function (node) {
-                if (!allLinkResults[node.href]) {
-                    filteredNodes.push(node);
-                }
-            })
-            return filteredNodes;
-        })
+        //     let filteredNodes = [];
+        //     allHrefNodes.forEach(function (node) {
+        //         if (!allLinkResults[node.href]) {
+        //             filteredNodes.push(node);
+        //         }
+        //     })
+        //     return filteredNodes;
+        // })
+
+        return new Promise((res) => res([]));
     }
 }
 
-export function cssSelector(node, selector) {
-    return new Promise((resolve) => {resolve(node.querySelectorAll(selector))});
+export function cssSelector(node, boundary) {
+    return new Promise((resolve) => {resolve(node.querySelectorAll(boundary.selector))});
 }
