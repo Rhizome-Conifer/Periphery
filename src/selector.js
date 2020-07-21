@@ -105,7 +105,7 @@ function buildHrefListDedup(nodes) {
 /*
     Selects all elements with href attribute and queries whether they point to an in-boundary resource
 */
-export function linkQuery(node, boundary) {
+export function linkQuery(node, _, host, endpoint) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
@@ -113,7 +113,7 @@ export function linkQuery(node, boundary) {
 
         // Query all deduped hrefs and correspond with their in-boundary status
         allHrefsDedup.forEach(function(href) {
-            allLinkPromises.push(queryResource(href)
+            allLinkPromises.push(queryResource(href, host, endpoint)
                 .then((isPresent) => {
                     return [href, isPresent];
                 })
