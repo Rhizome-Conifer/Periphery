@@ -3,8 +3,10 @@ import { cssSelector, linkQuery } from './selector';
 import { applyStylesToNodes, attachDivOverlay } from './mutator';
 
 export class BoundaryList {
-    constructor(boundaries) {
+    constructor(boundaries, host, cdxEndpoint) {
         this.boundaries = [];
+        this.host = host;
+        this.cdxEndpoint = cdxEndpoint;
         if (boundaries !== undefined) {
             boundaries.forEach(function(boundary, idx) {
                 let boundaryObject = new Boundary(boundary);
@@ -56,7 +58,7 @@ export class BoundaryList {
         if (boundary.action == 'inline-style') {
             matchedNodes = inlineStyle(document.head, boundary.actionStyle, boundary.selector);
         } else {
-            matchedNodes = selectorFuncs[boundary.selectorType](node, boundary.selector).then(function(nodes) {
+            matchedNodes = selectorFuncs[boundary.selectorType](node, boundary.selector, this.host, this.cdxEndpoint).then(function(nodes) {
             if (boundary.action == 'disable') {
                     boundary.actionStyle = {'pointer-events': 'none'};
                 }

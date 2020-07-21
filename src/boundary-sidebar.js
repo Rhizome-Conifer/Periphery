@@ -180,13 +180,15 @@ export class BoundarySidebar extends LitElement {
             boundaryDefaultOverlays: {attribute: false},
             boundariesApplied: {attribute: false},
             hidden: {attribute: true},
-            postMessageOrigin: {attribute: 'post-message-origin'}
+            postMessageOrigin: {attribute: 'post-message-origin'},
+            hostPrefix: {attribute: 'host-prefix'},
+            cdxEndpoint: {attribute: 'cdx-endpoint'}
         }
     }
 
     set boundaries(value) {
         let oldVal = this._boundaries;
-        this._boundaries = new BoundaryList(value);
+        this._boundaries = new BoundaryList(value, this.hostPrefix, this.cdxEndpoint);
         this.boundariesApplied = this._boundaries.applyBoundaries(function(boundary) {
             this.boundaryElemClasses[boundary.idx].loading = false;
             this.requestUpdate();
@@ -211,6 +213,7 @@ export class BoundarySidebar extends LitElement {
         this.boundaryElemClasses = {};
         this.boundaryDefaultOverlays = {};
 
+        this.cdxEndpoint = '/cdx';
         this.styles = {};
         this.hidden = false;
         this.postMessageOrigin = window.origin;

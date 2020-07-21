@@ -12,10 +12,10 @@ function checkCdxQueryResult(uri) {
     Queries backend CDX server to determine whether a given resource exists in the archive.
     link: A Node containing the href to check
 */
-function queryResource(href) {
+function queryResource(href, host, endpoint) {
     if (!href.startsWith('javascript')) {
-        let url = host + "cdx?output=json&limit=1&url=" + encodeURIComponent(href);
-        return checkCdxQueryResult(url).then(isPresent => isPresent);
+        let url = host + endpoint + "?output=json&limit=1&url=" + encodeURIComponent(href);
+        return checkCdxQueryResult(url);
     } else {
         // for javascript() hrefs and other things that we know aren't within boundary
         return new Promise((resolve) => resolve(false));
@@ -38,7 +38,7 @@ function buildHrefListDedup(nodes) {
 /*
     Selects all elements with href attribute and queries whether they point to an in-boundary resource
 */
-export function linkQuery(node) {
+export function linkQuery(node, _, host, endpoint) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
@@ -46,7 +46,7 @@ export function linkQuery(node) {
 
         // Query all deduped hrefs and correspond with their in-boundary status
         allHrefsDedup.forEach(function(href) {
-            allLinkPromises.push(queryResource(href)
+            allLinkPromises.push(queryResource(href, host, endpoint)
                 .then((isPresent) => {
                     return [href, isPresent];
                 })
