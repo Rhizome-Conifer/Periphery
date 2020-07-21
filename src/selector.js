@@ -53,13 +53,17 @@ export function linkQueryLazy(_, node, host, endpoint, callback) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allLinkResults = {};
         let queryCallback = getLinkQueryCallback(host, endpoint, allLinkResults, callback);
+        let observerOptions = {
+            rootMargin: '15px',
+            threshold: 0.1
+        }
 
         allHrefNodes.forEach(function(node) {
             let observer;
             let unobserveCallback = () => {
                 observer.disconnect();
             }
-            observer = new IntersectionObserver(getIntersectionCallback(queryCallback, unobserveCallback));
+            observer = new IntersectionObserver(getIntersectionCallback(queryCallback, unobserveCallback), observerOptions);
             observer.observe(node);
         })
     }
