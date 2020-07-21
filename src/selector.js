@@ -1,29 +1,41 @@
+/*
+    Returns a callback function which can be passed into the IntersectionObserver
+    @param callback: the callback function to be called on each intersected element
+    @param unobserveCallback: the callback to stop observing a given target element
+*/
 function getIntersectionCallback(callback, unobserveCallback) {
     return function(entries) {
         let elem = entries[0];
         // If there is no intersection, do nothing
         if (elem.intersectionRatio > 0) {
             callback(elem.target);
-            unobserveCallback(elem.target);
+            unobserveCallback();
         }
     }
 }
 
+/*
+    Returns a callback function to be passed into getIntersectionCallback, performing the link query on each intersected element.
+    @param queryResults: an Object mapping from href values to their in-boundary status
+    @param otherCallback: an upstream callback to be called on each out-of-boundary element
+*/
 function getLinkQueryCallback(queryResults, otherCallback) {
     return function(elem) {
         if (elem.href !== undefined) {
             let href = elem.href;
             if (queryResults[href] !== undefined) {
-                if (queryResults[href] === false) {
-                    otherCallback(elem);
-                }
-            } else {
-                queryResource(href).then((isPresent) => {
-                    queryResults[href] = isPresent;
-                    console.log
+                // If a link query is in progress, await it finishing to avoid multiple queries on the same href
+                queryResults[href].then((isPresent) => {
                     if (!isPresent) {
                         otherCallback(elem);
                     }
+                })
+            } else {
+                queryResults[href] = queryResource(href).then((isPresent) => {
+                    if (!isPresent) {
+                        otherCallback(elem);
+                    }
+                    return isPresent;
                 })
             }
         }

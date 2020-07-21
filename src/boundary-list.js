@@ -29,7 +29,6 @@ export class BoundaryList {
             let desc = overlay.type == 'tooltip' ? boundary.description : null;
             boundary.overlayDivs[overlayId] = [];
 
-            console.log(nodes);
             nodes.forEach(function (node) {
                 let overlayDiv = attachDivOverlay(node, className, desc, overlay.styles);
                 boundary.overlayDivs[overlayId].push(overlayDiv);
@@ -88,8 +87,6 @@ export class BoundaryList {
         this.boundaries.forEach(function (boundary) {
             if (boundary.selectorType === 'link-query-lazy') {
                 linkQueryLazy(boundary, document.body, function(node) {
-                    console.log('test');
-                    console.log(node);
                     this.performBoundaryAction([node], boundary);
                     boundary.pushAddedNodes([node]);
                     if (boundary.overlays !== undefined) {
