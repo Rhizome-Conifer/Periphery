@@ -69,7 +69,11 @@ export class BoundaryList {
         if (boundary.action == 'inline-style') {
             matchedNodes = inlineStyle(document.head, boundary.actionStyle, boundary.selector);
         } else {
+<<<<<<< HEAD
             matchedNodes = selectorFuncs[boundary.selectorType](node, boundary.selector, this.host, this.cdxEndpoint).then(function(nodes) {
+=======
+            matchedNodes = selectorFuncs[boundary.selectorType](node, boundary).then(function(nodes) {
+>>>>>>> 5eed16d11042e0da1bcd824576ae113cfce8d28c
                 return this.performBoundaryAction(nodes, boundary);
             }.bind(this));
         }
