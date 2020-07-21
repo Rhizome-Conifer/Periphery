@@ -18,6 +18,7 @@ export class BoundaryList {
 
     /*
         Creates elements corresponding to a boundary's overlays.
+        @param nodes: the nodes to which to attach boundaries.
         @param boundary: the given Boundary object.
     */
    createOverlays(nodes, boundary) {
@@ -29,7 +30,9 @@ export class BoundaryList {
 
             let className = overlay.type == 'tooltip' ? 'overlay-tooltip' : 'overlay';
             let desc = overlay.type == 'tooltip' ? boundary.description : null;
-            boundary.overlayDivs[overlayId] = [];
+            if (boundary.overlayDivs[overlayId] === undefined) {
+                boundary.overlayDivs[overlayId] = [];
+            }
 
             nodes.forEach(function (node) {
                 let overlayDiv = attachDivOverlay(node, className, desc, overlay.styles);
