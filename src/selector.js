@@ -19,7 +19,7 @@ function getIntersectionCallback(callback, unobserveCallback) {
     @param queryResults: an Object mapping from href values to their in-boundary status
     @param otherCallback: an upstream callback to be called on each out-of-boundary element
 */
-function getLinkQueryCallback(queryResults, otherCallback) {
+function getLinkQueryCallback(host, endpoint, queryResults, otherCallback) {
     return function(elem) {
         if (elem.href !== undefined) {
             let href = elem.href;
@@ -31,7 +31,7 @@ function getLinkQueryCallback(queryResults, otherCallback) {
                     }
                 })
             } else {
-                queryResults[href] = queryResource(href).then((isPresent) => {
+                queryResults[href] = queryResource(href, host, endpoint).then((isPresent) => {
                     if (!isPresent) {
                         otherCallback(elem);
                     }
@@ -48,11 +48,11 @@ function getLinkQueryCallback(queryResults, otherCallback) {
     @param node: the root HTML element from which to query
     @param callback: the function to be called with intersected elements to be passed into
 */
-export function linkQueryLazy(boundary, node, callback) {
+export function linkQueryLazy(_, node, host, endpoint, callback) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allLinkResults = {};
-        let queryCallback = getLinkQueryCallback(allLinkResults, callback);
+        let queryCallback = getLinkQueryCallback(host, endpoint, allLinkResults, callback);
 
         allHrefNodes.forEach(function(node) {
             let observer;
