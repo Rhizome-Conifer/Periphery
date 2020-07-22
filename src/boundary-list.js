@@ -91,26 +91,36 @@ export class BoundaryList {
         let runningBoundaries = [];
         // Should always apply boundaries once on DOM load, whether or not the boundary is 'observer' type or not
         this.boundaries.forEach(function (boundary) {
-            if (boundary.selectorType === 'link-query-lazy') {
-                linkQueryLazy(boundary, document.body, this.host, this.cdxEndpoint, function(node) {
-                    this.performBoundaryAction([node], boundary);
-                    boundary.pushAddedNodes([node]);
-                    if (boundary.overlays !== undefined) {
-                        this.createOverlays([node], boundary);
-                    }
-                }.bind(this));
-                onLoadCallback(boundary);
-            } else {
-                if (boundary.type == 'observer') {
-                    observerBoundaries.push(boundary);
-                }
-                let boundaryStatus = this.applyBoundary(document.body, boundary);
-                runningBoundaries.push(boundaryStatus);
-                boundaryStatus.then((boundary) => {
-                    if (onLoadCallback) {
+            if (boundary.resource !== 'all') {
+                // If the resource string doesn't contain a wildcard, we want to match the string exactly
+                // Note that we can't match the beginning of the string because of URL rewriting
+                let wildcardVal = boundary.resource.indexOf('*') === -1 ? '$' : ''; 
+                let re = new RegExp(boundary.resource + wildcardVal);
+                let hrefMatch = window.location.href.match(re);
+                
+                if (hrefMatch !== null) {
+                    if (boundary.selectorType === 'link-query-lazy') {
+                        linkQueryLazy(boundary, document.body, this.host, this.cdxEndpoint, function(node) {
+                            this.performBoundaryAction([node], boundary);
+                            boundary.pushAddedNodes([node]);
+                            if (boundary.overlays !== undefined) {
+                                this.createOverlays([node], boundary);
+                            }
+                        }.bind(this));
                         onLoadCallback(boundary);
-                    }
-                });       
+                    } else {
+                        if (boundary.type == 'observer') {
+                            observerBoundaries.push(boundary);
+                        }
+                        let boundaryStatus = this.applyBoundary(document.body, boundary);
+                        runningBoundaries.push(boundaryStatus);
+                        boundaryStatus.then((boundary) => {
+                            if (onLoadCallback) {
+                                onLoadCallback(boundary);
+                            }
+                        });       
+                    }        
+                }
             }
         }.bind(this));
 

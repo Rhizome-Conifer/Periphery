@@ -7,6 +7,7 @@ export class Boundary {
         if (boundary.resource === undefined || typeof boundary.resource !== 'string') {
             throw new TypeError('Missing / incorrect resource matcher for boundary.')
         }
+        this.resource = boundary.resource;
 
         if (boundary.type !== 'on-load' && boundary.type !== 'mutation-observer') {
             throw new TypeError('Incorrect type for boundary.')
