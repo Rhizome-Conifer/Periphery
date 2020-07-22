@@ -141,6 +141,6 @@ export function linkQuery(node, _, host, endpoint) {
     }
 }
 
-export function cssSelector(node, boundary) {
-    return new Promise((resolve) => {resolve(node.querySelectorAll(boundary.selector))});
+export function cssSelector(node, selector) {
+    return new Promise((resolve) => {resolve(node.querySelectorAll(selector))});
 }
