@@ -61,7 +61,6 @@ export function sidebarTestRunner() {
             return Promise.all([sidebar.updateComplete, sidebar.boundariesApplied]).then(() => {
                 let overlayRoot = sidebar.shadowRoot.querySelector('.overlay-root');
                 let overlay = overlayRoot.children[0];
-                console.log(overlay);
                 expect(overlay.shadowRoot.children[0].style.width).toEqual('25px');    
                 expect(overlay.shadowRoot.children[0].style.height).toEqual('40px');    
             })
