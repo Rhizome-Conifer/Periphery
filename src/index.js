@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // var boundaries = new BoundaryList(meta);
     // boundaries.applyBoundaries();
     let sidebar = document.querySelector('boundary-sidebar');
-    console.log(sidebar);
     sidebar.boundaries = meta;
     // sidebar.populateBoundaryList();
 });

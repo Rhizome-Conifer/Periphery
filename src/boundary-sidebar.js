@@ -196,7 +196,6 @@ export class BoundarySidebar extends LitElement {
         })
         
         this.boundariesApplied = this._boundaries.applyBoundaries(function(boundary) {
-            console.log('done applying');
             this.boundaryElemClasses[boundary.idx].loading = false;
             this.requestUpdate();
         }.bind(this));
@@ -226,7 +225,6 @@ export class BoundarySidebar extends LitElement {
         Handle postMessage events from outside the iframe (framed replay mode)
     */
     handlePostMessage(msg) {
-        console.log(this.postMessageOrigin);
         if (msg.origin === this.postMessageOrigin) {
             let msgData = JSON.parse(msg.data);
             let oldVal = this.styles;
@@ -311,8 +309,6 @@ export class BoundarySidebar extends LitElement {
         @param boundary: 
     */
     overlayList(boundary) {
-        console.log('overlays');
-        console.log(boundary.overlays)
         return html`
         <div class="boundary-overlay">
             Overlays visible: 
@@ -358,8 +354,6 @@ export class BoundarySidebar extends LitElement {
     }
 
     render() {
-        console.log('rendering');
-        console.log(this._boundaries.boundaries);
         return html`
         <style>
             ${this.getExternalStyle()}

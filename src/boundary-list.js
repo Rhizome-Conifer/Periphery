@@ -75,6 +75,7 @@ export class BoundaryList {
         }
         // Update the list of added nodes, and attach overlays if applicable
         return matchedNodes.then(function(nodes) {
+            boundary.pushAddedNodes(nodes);
             if (boundary.overlays !== undefined) {
                 this.createOverlays(nodes, boundary);
             }
