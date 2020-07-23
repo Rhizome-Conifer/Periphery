@@ -2,8 +2,10 @@ import { BoundarySidebar } from '../src/boundary-sidebar';
 
 export function sidebarTestRunner() {
     describe('renders boundary sidebar correctly', () => {
+
+        // const { location } = window;
+        let windowMock;
         const TEST_ID = 'test-div';
-        customElements.define('boundary-sidebar', BoundarySidebar);
         const testBoundaries = [{
             "resource": "all",
             "selector": {
@@ -27,8 +29,9 @@ export function sidebarTestRunner() {
                 "type": "disable"
             },
             "description": "test boundary 2."
-        },
-        ]
+        }];
+        customElements.define('boundary-sidebar', BoundarySidebar);
+        
 
         beforeEach(() => {
             let elemStyle = 'position: absolute; top: 15px; left: 15px; width: 25px; height: 40px;'
@@ -73,6 +76,30 @@ export function sidebarTestRunner() {
                 let testDiv = document.querySelector('#' + TEST_ID);
                 expect(testDiv.style.pointerEvents).toEqual('none');    
             })
+        });
+
+        test('performs resource matching correctly', () => {
+            const resourceBoundary = [{
+                "resource": "http://testweb.site/testing",
+                "selector": {
+                    "type": "css-selector",
+                    "query": "#test-div"
+                },
+                "type": "on-load",
+                "action": {
+                    "type": "disable"
+                },
+                "description": "test boundary."
+            }];
+            let sidebar = document.createElement('boundary-sidebar');
+            document.body.appendChild(sidebar);
+            sidebar.boundaries = resourceBoundary;
+            return Promise.all([sidebar.updateComplete, sidebar.boundariesApplied]).then(() => {
+                // Should not perform any boundary application, because window.location.href doesn't match
+                let testDiv = document.querySelector('#' + TEST_ID);
+                expect(testDiv.style.pointerEvents).toEqual('');    
+            })
+
         })
         
     });

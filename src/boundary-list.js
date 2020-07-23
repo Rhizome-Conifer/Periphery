@@ -98,6 +98,7 @@ export class BoundaryList {
                 // Note that we can't match the beginning of the string because of URL rewriting
                 let wildcardVal = boundary.resource.indexOf('*') === -1 ? '$' : ''; 
                 let re = new RegExp(boundary.resource + wildcardVal);
+                console.log(re);
                 hrefMatch = window.location.href.match(re);
             }
 
