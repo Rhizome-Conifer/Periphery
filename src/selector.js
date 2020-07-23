@@ -27,13 +27,15 @@ function getLinkQueryCallback(host, endpoint, pool, queryResults, otherCallback)
             let href = elem.href;
             if (queryResults[href] !== undefined) {
                 // If a link query is in progress, await it finishing to avoid multiple queries on the same href
-                queryResults[href].then((isPresent) => {
+                queryResults[href].then((res) => {
+                    let isPresent = res[1]
                     if (!isPresent) {
                         otherCallback(elem);
                     }
                 })
             } else {
-                queryResults[href] = pool.processSingle(href).then((res) => {
+                let result = pool === undefined ? queryResource(href, host, endpoint) : pool.processSingle(href);
+                queryResults[href] = result.then((res) => {
                     let isPresent = res[1];
                     if (!isPresent) {
                         otherCallback(elem);
@@ -44,37 +46,6 @@ function getLinkQueryCallback(host, endpoint, pool, queryResults, otherCallback)
         }
     }
 }
-
-/*
-    Uses an IntersectionObserver to perform link queries on elements only as they are loaded into view.
-    @param boundary: the Boundary being applied
-    @param node: the root HTML element from which to query
-    @param callback: the function to be called with intersected elements to be passed into
-*/
-export function linkQueryLazy(_, node, host, endpoint, callback) {
-    if (node && node.nodeType === Node.ELEMENT_NODE) {
-        let numThreads = navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 4;
-        let pool = new Pool(numThreads, host, endpoint);
-
-        let allHrefNodes = node.querySelectorAll('[href]');
-        let allLinkResults = {};
-        let queryCallback = getLinkQueryCallback(host, endpoint, pool, allLinkResults, callback);
-        let observerOptions = {
-            rootMargin: '15px',
-            threshold: 0.1
-        }
-
-        allHrefNodes.forEach(function(node) {
-            let observer;
-            let unobserveCallback = () => {
-                observer.disconnect();
-            }
-            observer = new IntersectionObserver(getIntersectionCallback(queryCallback, unobserveCallback), observerOptions);
-            observer.observe(node);
-        })
-    }
-}
-
 
 /*
     Determine whether a given backend CDX query returns a result.
@@ -92,10 +63,10 @@ function checkCdxQueryResult(uri) {
 function queryResource(href, host, endpoint) {
     if (!href.startsWith('javascript')) {
         let url = host + endpoint + "?output=json&limit=1&url=" + encodeURIComponent(href);
-        return checkCdxQueryResult(url);
+        return [href, checkCdxQueryResult(url)];
     } else {
         // for javascript() hrefs and other things that we know aren't within boundary
-        return new Promise((resolve) => resolve(false));
+        return new Promise((resolve) => resolve([href, false]));
     }
 }
 
@@ -115,39 +86,60 @@ function buildHrefListDedup(nodes) {
 /*
     Selects all elements with href attribute and queries whether they point to an in-boundary resource
 */
-export function linkQuery(node, _, host, endpoint) {
+export function linkQuery(node, _, host, endpoint, options) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
+        let pool;
+        let allLinkPromises;
 
-        let numThreads = navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 4;
-        let pool = new Pool(numThreads, host, endpoint);
-        let allLinkPromises = pool.processInput(allHrefsDedup);
+        // Create thread worker pool if option is enabled
+        if (options['worker']) {
+            let numThreads = navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 4;
+            pool = new Pool(numThreads, host, endpoint);
+        } 
 
-        // // Query all deduped hrefs and correspond with their in-boundary status
-        // allHrefsDedup.forEach(function(href) {
-        //     allLinkPromises.push(queryResource(href, host, endpoint)
-        //         .then((isPresent) => {
-        //             return [href, isPresent];
-        //         })
-        //     );
-        // }); 
-
-        return allLinkPromises.then((nodes) => {
-            console.log(nodes);
+        if (options['lazy-loading']) {
             let allLinkResults = {};
-            nodes.forEach(function (node) {
-                allLinkResults[node[0]] = node[1];
-            })
-
-            let filteredNodes = [];
-            allHrefNodes.forEach(function (node) {
-                if (!allLinkResults[node.href]) {
-                    filteredNodes.push(node);
+            let queryCallback = getLinkQueryCallback(host, endpoint, pool, allLinkResults, callback);
+            let observerOptions = {
+                rootMargin: '15px',
+                threshold: 0.1
+            }
+    
+            allHrefNodes.forEach(function(node) {
+                let observer;
+                let unobserveCallback = () => {
+                    observer.disconnect();
                 }
+                observer = new IntersectionObserver(getIntersectionCallback(queryCallback, unobserveCallback), observerOptions);
+                observer.observe(node);
+            })    
+        } else {
+            if (pool) { // If using web worker thread pool
+                allLinkPromises = pool.processInput(allHrefsDedup);    
+            } else {
+                // Query all deduped hrefs and correspond with their in-boundary status
+                allHrefsDedup.forEach(function(href) {
+                    allLinkPromises.push(queryResource(href, host, endpoint));
+                }); 
+            }
+            return allLinkPromises.then((nodes) => {
+                let allLinkResults = {};
+                // Build a map from hrefs to their in-boundary status
+                nodes.forEach(function (node) {
+                    allLinkResults[node[0]] = node[1];
+                })
+    
+                let filteredNodes = [];
+                allHrefNodes.forEach(function (node) {
+                    if (!allLinkResults[node.href]) {
+                        filteredNodes.push(node);
+                    }
+                })
+                return filteredNodes;
             })
-            return filteredNodes;
-        })
+        }
     }
 }
 
