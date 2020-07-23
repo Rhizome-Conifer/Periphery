@@ -130,7 +130,6 @@ export function linkQuery(node, _, host, endpoint) {
         // }); 
 
         return Promise.all(allLinkPromises).then((nodes) => {
-            console.log(nodes);
             let allLinkResults = {};
             nodes.forEach(function (node) {
                 allLinkResults[node[0]] = node[1];

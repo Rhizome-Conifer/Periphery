@@ -42,16 +42,21 @@ export class Pool {
         return workerThreads;
     }
 
-    processInput(input) {
-        let tasks = []
-        input.forEach(function(val) {
-            tasks.push(new Promise(function(resolve) {
+    processSingle(val) {
+        return new Promise(
+            function(resolve) {
                 this.addTask(val, function(res) {
                     resolve(res);
                 })
-            }.bind(this)))
-        }.bind(this));
+            }
+        .bind(this));
+    }
 
+    processInput(input) {
+        let tasks = [];
+        input.forEach(function(val) {
+            tasks.push(this.processSingle(val))
+        }.bind(this));
         return tasks; 
     }
 
