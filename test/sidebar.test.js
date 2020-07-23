@@ -2,9 +2,6 @@ import { BoundarySidebar } from '../src/boundary-sidebar';
 
 export function sidebarTestRunner() {
     describe('renders boundary sidebar correctly', () => {
-
-        // const { location } = window;
-        let windowMock;
         const TEST_ID = 'test-div';
         const testBoundaries = [{
             "resource": "all",
