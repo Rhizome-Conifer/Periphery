@@ -20,7 +20,6 @@ export class Pool {
             let host = e.data.host;
             let endpoint = e.data.endpoint;
             let href = e.data.href;
-            console.log(e.data);
             if (!href.startsWith('javascript')) {
                 let url = host + endpoint + "?output=json&limit=1&url=" + encodeURIComponent(href);
                 checkCdxQueryResult(url).then((isPresent) => {
