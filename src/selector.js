@@ -116,9 +116,7 @@ export function linkQuery(node, _, host, endpoint) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
 
-        console.log('testing');
-        console.log(Worker);
-        let pool = new Pool(4);
+        let pool = new Pool(4, host, endpoint);
         let allLinkPromises = pool.processInput(allHrefsDedup);
 
         // // Query all deduped hrefs and correspond with their in-boundary status

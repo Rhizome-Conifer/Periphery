@@ -7,7 +7,7 @@ export class Pool {
         this.workerQueue = this.init(size);
     }
 
-    init(size) {
+    init() {
         // Create the blob URL for the worker function
         let workerFunc = `
         function checkCdxQueryResult(uri) {
@@ -20,6 +20,7 @@ export class Pool {
             let host = e.data.host;
             let endpoint = e.data.endpoint;
             let href = e.data.href;
+            console.log(e.data);
             if (!href.startsWith('javascript')) {
                 let url = host + endpoint + "?output=json&limit=1&url=" + encodeURIComponent(href);
                 checkCdxQueryResult(url).then((isPresent) => {
@@ -35,7 +36,7 @@ export class Pool {
         var url = URL.createObjectURL(blob);
 
         let workerThreads = [];
-        for (let i=0;i<size;i++) {
+        for (let i=0;i<this.size;i++) {
             workerThreads.push(new WorkerThread(this.host, this.endpoint, url, this.freeThread.bind(this)));
         }
         return workerThreads;
@@ -85,7 +86,7 @@ class WorkerThread {
             task.callback(val);
             this.freeThread(this);
         }
-        this.worker.postMessage({host: this.host, endpoint: this.endpoint, href: task.message.href});
+        this.worker.postMessage({host: this.host, endpoint: this.endpoint, href: task.message});
     }
 }
 
