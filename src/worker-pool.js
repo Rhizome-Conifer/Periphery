@@ -1,3 +1,6 @@
+/*
+    Based on the thread pool JS implementation here: http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool/
+*/
 export class Pool {
     constructor(size, host, endpoint) {
         this.size = size;
@@ -8,6 +11,9 @@ export class Pool {
         this.tasks = [];
     }
 
+    /*
+        Initializes worker threads and create a blob for the Worker script
+    */
     init() {
         // Create the blob URL for the worker function
         let workerFunc = `
@@ -30,8 +36,9 @@ export class Pool {
                 // for javascript() hrefs and other things that we know aren't within boundary
                 self.postMessage([href, false]);
             }
-        };
-        `;
+        };`;
+
+        // Use a Blob URL to avoid conflicts with Wombat worker rewriting
         let blob = new Blob([workerFunc], { type: 'application/javascript' });
         var url = URL.createObjectURL(blob);
 
@@ -42,6 +49,10 @@ export class Pool {
         return workerThreads;
     }
 
+    /*
+        Add a single input item to the task queue, returning a Promise that resolves once the item has been queried
+        @param val: the href to query
+    */
     processSingle(val) {
         return new Promise(
             function(resolve) {
@@ -52,6 +63,10 @@ export class Pool {
         .bind(this));
     }
 
+    /*
+        Process an input array, returning an array of Promises corresponding to the inputs being processed.
+        @param input: the array of inputs to process
+    */
     processInput(input) {
         let tasks = [];
         input.forEach(function(val) {
@@ -60,6 +75,11 @@ export class Pool {
         return tasks; 
     }
 
+    /*
+        Add a new task to the task queue.
+        @param msg: the message containing data to be processed
+        @param callback: the callback to be called once data has finished processing
+    */
     addTask(msg, callback) {
         if (this.workerQueue.length > 0) {
             let workerThread = this.workerQueue.shift();
@@ -69,6 +89,10 @@ export class Pool {
         }
     }
 
+    /*
+        Given a recently-completed worker, assigns it a new task if there is one, and if not puts the worker thread in the queue of available threads.
+        @param workerThread: the WorkerThread that has just finished processing.
+    */
     freeThread(workerThread) {
         if (this.taskQueue.length > 0 ) {
             let newTask = this.taskQueue.shift();
@@ -87,7 +111,12 @@ class WorkerThread {
         this.freeThread = freeThread;
     }
 
+    /*
+        Run a given WorkerTask.
+        @param task: the WorkerTask to complete.
+    */
     run(task) {
+        // On worker finish, call the callback and free the worker thread
         this.worker.onmessage = (val) => {
             task.callback(val);
             this.freeThread(this);

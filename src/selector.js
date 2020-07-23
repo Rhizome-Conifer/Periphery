@@ -21,7 +21,7 @@ function getIntersectionCallback(callback, unobserveCallback) {
     @param queryResults: an Object mapping from href values to their in-boundary status
     @param otherCallback: an upstream callback to be called on each out-of-boundary element
 */
-function getLinkQueryCallback(host, endpoint, queryResults, otherCallback) {
+function getLinkQueryCallback(host, endpoint, pool, queryResults, otherCallback) {
     return function(elem) {
         if (elem.href !== undefined) {
             let href = elem.href;
@@ -33,7 +33,8 @@ function getLinkQueryCallback(host, endpoint, queryResults, otherCallback) {
                     }
                 })
             } else {
-                queryResults[href] = queryResource(href, host, endpoint).then((isPresent) => {
+                queryResults[href] = pool.processSingle(href).then((res) => {
+                    let isPresent = res[1];
                     if (!isPresent) {
                         otherCallback(elem);
                     }
@@ -52,9 +53,12 @@ function getLinkQueryCallback(host, endpoint, queryResults, otherCallback) {
 */
 export function linkQueryLazy(_, node, host, endpoint, callback) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
+        let numThreads = navigator.hardwareConcurrency ? navigator.hardwareConcurrency - 1 : 4;
+        let pool = new Pool(numThreads, host, endpoint);
+
         let allHrefNodes = node.querySelectorAll('[href]');
         let allLinkResults = {};
-        let queryCallback = getLinkQueryCallback(host, endpoint, allLinkResults, callback);
+        let queryCallback = getLinkQueryCallback(host, endpoint, pool, allLinkResults, callback);
         let observerOptions = {
             rootMargin: '15px',
             threshold: 0.1
