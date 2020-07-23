@@ -1,3 +1,5 @@
+import { Pool } from './worker-pool';
+
 /*
     Returns a callback function which can be passed into the IntersectionObserver
     @param callback: the callback function to be called on each intersected element
@@ -114,6 +116,8 @@ export function linkQuery(node, _, host, endpoint) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
 
+        console.log('testing');
+        console.log(Worker);
         let pool = new Pool(4);
         let allLinkPromises = pool.processInput(allHrefsDedup);
 

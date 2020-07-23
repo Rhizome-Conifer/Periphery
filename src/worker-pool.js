@@ -48,18 +48,37 @@ export class Pool {
 
 class WorkerThread {
     constructor(freeThread) {
-        this.worker = new Worker('query.worker.js', { type: 'module' });
+        let workerFunc = `function checkCdxQueryResult(uri) {
+            return fetch(uri).then
+            (res => res.text()).then
+            (response => response != '');
+        }
+        
+        onmessage = function(e) {
+            console.log('received message');
+            let href = e.data;
+            console.log(href);
+            checkCdxQueryResult(href).then((isPresent) => {
+                console.log(isPresent);
+                self.postMessage([href, isPresent]);
+            })
+        };
+        `;
+
+        let blob = new Blob([workerFunc], { type: 'application/javascript' });
+        var url = URL.createObjectURL(blob);
+        this.worker = new Worker(url);
+        URL.revokeObjectURL(url);
         this.freeThread = freeThread;
     }
 
     run(task) {
-        // console.log(this.worker.onmessage)
+        console.log(this.worker)
         this.worker.onmessage = (val) => {
             console.log(val);
             task.callback(val);
             this.freeThread(this);
         }
-        console.log(this.worker);
         this.worker.postMessage(task.message);
     }
 }
