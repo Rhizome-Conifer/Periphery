@@ -5,6 +5,7 @@ export class Pool {
         this.endpoint = endpoint;
         this.taskQueue = [];
         this.workerQueue = this.init(size);
+        this.tasks = [];
     }
 
     init() {
@@ -42,7 +43,7 @@ export class Pool {
     }
 
     processInput(input) {
-        let tasks = [];
+        let tasks = []
         input.forEach(function(val) {
             tasks.push(new Promise(function(resolve) {
                 this.addTask(val, function(res) {
@@ -50,7 +51,8 @@ export class Pool {
                 })
             }.bind(this)))
         }.bind(this));
-        return Promise.all(tasks).then((vals) => {return vals});
+
+        return tasks; 
     }
 
     addTask(msg, callback) {
