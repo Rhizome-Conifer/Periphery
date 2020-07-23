@@ -139,7 +139,7 @@ By default, the sidebar only accepts `postMessage`s from the same origin, so if 
 Boundaries must be valid JSON objects. The specification for boundaries is as follows (note that boundaries should be enclosed in an array, even if there is only one):
 ```
 [{
-    "resource": "all" | <resource URI> | <URL prefix with wildcard>,
+    "resource": "all" | <resource URL> | <URL prefix with wildcard>,
     "selector": {
         "type": "css-selector" | "link-query" | "element-selector",
         "query" (optional): <CSS selector> 
@@ -168,6 +168,9 @@ Boundaries must be valid JSON objects. The specification for boundaries is as fo
     "description": <boundary description>
 }]
 ```
+### Resource Matching
+
+The `resource` property of a boundary can be used to specify specific pages to which a boundary should be applied. The `all` option will apply the boundary to all pages; alternatively, you can specify a particular URL to match, optionally using a wildcard character (`*`) to match a range of pages. For instance, `resource: http://test.site/user` will match only that exact URL, but `resource: http://test.site/*` will match all pages on that domain. Wildcards are also useful for resources that include `GET` request parameters in the URL, so, `http://test.site/user*` will match `http://test.site/user?id=1234`, etc.
 
 ## postMessage Specification
 
