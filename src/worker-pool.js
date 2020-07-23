@@ -1,4 +1,3 @@
-
 export class Pool {
     constructor(size, script) {
         this.size = size;
@@ -10,7 +9,7 @@ export class Pool {
     init(size) {
         let workerThreads = [];
         for (let i=0;i<size;i++) {
-            workerThreads.push(new WorkerThread(this.freeThread));
+            workerThreads.push(new WorkerThread(this.freeThread.bind(this)));
         }
         return workerThreads;
     }
@@ -24,7 +23,7 @@ export class Pool {
                 })
             }.bind(this)))
         }.bind(this));
-        return Promise.all(tasks).then((vals) => {console.log(vals); return vals});
+        return Promise.all(tasks).then((vals) => {return vals});
     }
 
     addTask(msg, callback) {
@@ -48,20 +47,26 @@ export class Pool {
 
 class WorkerThread {
     constructor(freeThread) {
-        let workerFunc = `function checkCdxQueryResult(uri) {
+        let workerFunc = `
+        function checkCdxQueryResult(uri) {
             return fetch(uri).then
             (res => res.text()).then
             (response => response != '');
         }
         
         onmessage = function(e) {
-            console.log('received message');
-            let href = e.data;
-            console.log(href);
-            checkCdxQueryResult(href).then((isPresent) => {
-                console.log(isPresent);
-                self.postMessage([href, isPresent]);
-            })
+            let host = e.data.host;
+            let endpoint = e.data.endpoint;
+            let href = e.data.href;
+            if (!href.startsWith('javascript')) {
+                let url = host + endpoint + "?output=json&limit=1&url=" + encodeURIComponent(href);
+                checkCdxQueryResult(url).then((isPresent) => {
+                    self.postMessage([href, isPresent]);
+                });
+            } else {
+                // for javascript() hrefs and other things that we know aren't within boundary
+                self.postMessage([href, false]);
+            }
         };
         `;
 
@@ -73,13 +78,11 @@ class WorkerThread {
     }
 
     run(task) {
-        console.log(this.worker)
         this.worker.onmessage = (val) => {
-            console.log(val);
             task.callback(val);
             this.freeThread(this);
         }
-        this.worker.postMessage(task.message);
+        this.worker.postMessage({host: task.message.host, endpoint: task.message.endpoint, href: task.message.href});
     }
 }
 

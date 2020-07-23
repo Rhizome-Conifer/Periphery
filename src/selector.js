@@ -121,14 +121,14 @@ export function linkQuery(node, _, host, endpoint) {
         let pool = new Pool(4);
         let allLinkPromises = pool.processInput(allHrefsDedup);
 
-        // Query all deduped hrefs and correspond with their in-boundary status
-        allHrefsDedup.forEach(function(href) {
-            allLinkPromises.push(queryResource(href, host, endpoint)
-                .then((isPresent) => {
-                    return [href, isPresent];
-                })
-            );
-        }); 
+        // // Query all deduped hrefs and correspond with their in-boundary status
+        // allHrefsDedup.forEach(function(href) {
+        //     allLinkPromises.push(queryResource(href, host, endpoint)
+        //         .then((isPresent) => {
+        //             return [href, isPresent];
+        //         })
+        //     );
+        // }); 
 
         return allLinkPromises.then((nodes) => {
             console.log(nodes);
