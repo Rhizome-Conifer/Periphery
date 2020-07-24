@@ -47,7 +47,7 @@ export function sidebarTestRunner() {
             let sidebar = document.createElement('boundary-sidebar');
             document.body.appendChild(sidebar);
             sidebar.boundaries = testBoundaries;
-            return sidebar.updateComplete.then((complete) => {
+            return sidebar.updateComplete.then(() => {
                 let boundaryList = sidebar.shadowRoot.querySelector('#boundary-list');
                 expect(boundaryList.children.length).toEqual(2);
             });
@@ -69,7 +69,7 @@ export function sidebarTestRunner() {
             let sidebar = document.createElement('boundary-sidebar');
             document.body.appendChild(sidebar);
             sidebar.boundaries = testBoundaries;
-            return Promise.all([sidebar.updateComplete, sidebar.boundariesApplied]).then(() => {
+            return sidebar.boundariesApplied.then(() => {
                 let testDiv = document.querySelector('#' + TEST_ID);
                 expect(testDiv.style.pointerEvents).toEqual('none');    
             })
@@ -91,7 +91,7 @@ export function sidebarTestRunner() {
             let sidebar = document.createElement('boundary-sidebar');
             document.body.appendChild(sidebar);
             sidebar.boundaries = resourceBoundary;
-            return Promise.all([sidebar.updateComplete, sidebar.boundariesApplied]).then(() => {
+            return sidebar.boundariesApplied.then(() => {
                 // Should not perform any boundary application, because window.location.href doesn't match
                 let testDiv = document.querySelector('#' + TEST_ID);
                 expect(testDiv.style.pointerEvents).toEqual('');    
