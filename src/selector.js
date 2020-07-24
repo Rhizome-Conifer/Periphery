@@ -27,8 +27,7 @@ function getLinkQueryCallback(host, endpoint, pool, queryResults, otherCallback)
             let href = elem.href;
             if (queryResults[href] !== undefined) {
                 // If a link query is in progress, await it finishing to avoid multiple queries on the same href
-                queryResults[href].then((res) => {
-                    let isPresent = res[1]
+                queryResults[href].then((isPresent) => {
                     if (!isPresent) {
                         otherCallback([elem]);
                     }
@@ -90,12 +89,13 @@ function buildHrefListDedup(nodes) {
 /*
     Selects all elements with href attribute and queries whether they point to an in-boundary resource
 */
-export function linkQuery(node, _, host, endpoint, callback, options) {
+export function linkQuery(node, _, callback, host, endpoint, boundaryOptions) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
         let pool;
         let allLinkPromises;
+        let options = boundaryOptions || {};
 
         // Create thread worker pool if option is enabled
         if (options['worker']) {
@@ -123,13 +123,14 @@ export function linkQuery(node, _, host, endpoint, callback, options) {
             if (pool) { // If using web worker thread pool
                 allLinkPromises = pool.processInput(allHrefsDedup);    
             } else {
+                allLinkPromises = [];
                 // Query all deduped hrefs and correspond with their in-boundary status
                 allHrefsDedup.forEach(function(href) {
                     allLinkPromises.push(queryResource(href, host, endpoint));
                 }); 
             }
 
-            allLinkPromises.then((nodes) => {
+            Promise.all(allLinkPromises).then((nodes) => {
                 let allLinkResults = {};
                 // Build a map from hrefs to their in-boundary status
                 nodes.forEach(function (node) {

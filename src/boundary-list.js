@@ -76,7 +76,7 @@ export class BoundaryList {
                     this.createOverlays(nodes, boundary);
                 }
                 onLoadCallback(boundary);
-            }.bind(this), this.host, this.cdxEndpoint);
+            }.bind(this), this.host, this.cdxEndpoint, boundary.selectorOptions);
         }
     }
 
@@ -104,11 +104,11 @@ export class BoundaryList {
                 } else {
                     // If the boundary uses lazy loading, we don't need to wait for it to finish loading
                     // TODO: figure out a way to wait for an "initial load"
-                    if (!boundary.selector.options || !boundary.selector.options['lazy-loading']) {
+                    if (!boundary.selectorOptions || !boundary.selectorOptions['lazy-loading']) {
                         runningBoundaries += 1;
                     }
                     this.applyBoundary(document.body, boundary, function(boundary) {
-                        if (!boundary.selector.options || !boundary.selector.options['lazy-loading']) {
+                        if (!boundary.selectorOptions || !boundary.selectorOptions['lazy-loading']) {
                             runningBoundaries -= 1;
                             if (runningBoundaries == 0) {
                                 onCompleteCallback();
