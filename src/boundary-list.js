@@ -104,11 +104,11 @@ export class BoundaryList {
                 } else {
                     // If the boundary uses lazy loading, we don't need to wait for it to finish loading
                     // TODO: figure out a way to wait for an "initial load"
-                    if (boundary.selector.options && !boundary.selector.options['lazy-loading']) {
+                    if (!boundary.selector.options || !boundary.selector.options['lazy-loading']) {
                         runningBoundaries += 1;
                     }
-                    let boundaryStatus = this.applyBoundary(document.body, boundary, function(boundary) {
-                        if (boundary.selector.options && !boundary.selector.options['lazy-loading']) {
+                    this.applyBoundary(document.body, boundary, function(boundary) {
+                        if (!boundary.selector.options || !boundary.selector.options['lazy-loading']) {
                             runningBoundaries -= 1;
                             if (runningBoundaries == 0) {
                                 onCompleteCallback();
@@ -117,8 +117,17 @@ export class BoundaryList {
                         onLoadCallback(boundary);
                     });
                 }
+            } else {
+                // TODO should probably show some indicator that the boundary wasn't applied to this resource
+                onLoadCallback(boundary);
             }
         }.bind(this));
+
+        // If we have no async boundaries applied, make sure we still call the callback
+        if (runningBoundaries === 0) {
+            runningBoundaries = -1;
+            onCompleteCallback();
+        }
 
         if (observerBoundaries.length > 0) {
             let observerOptions = {
