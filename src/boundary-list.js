@@ -59,7 +59,7 @@ export class BoundaryList {
         @param boundary: the given Boundary object
         @param node: the root DOM node from which to apply the boundary
     */
-    applyBoundary(node, boundary) {
+    applyBoundary(node, boundary, onLoadCallback) {
         let selectorFuncs = {
             'css-selector': cssSelector,
             'link-query': linkQuery
@@ -69,27 +69,23 @@ export class BoundaryList {
         if (boundary.action == 'inline-style') {
             matchedNodes = inlineStyle(document.head, boundary.actionStyle, boundary.selector);
         } else {
-            matchedNodes = selectorFuncs[boundary.selectorType](node, boundary.selector, this.host, this.cdxEndpoint).then(function(nodes) {
-                if (nodes !== null)
-                return this.performBoundaryAction(nodes, boundary);
-            }.bind(this));
+            selectorFuncs[boundary.selectorType](node, boundary.selector, function(nodes) {
+                this.performBoundaryAction(nodes, boundary);
+                boundary.pushAddedNodes(nodes);
+                if (boundary.overlays !== undefined) {
+                    this.createOverlays(nodes, boundary);
+                }
+                onLoadCallback(boundary);
+            }.bind(this), this.host, this.cdxEndpoint);
         }
-        // Update the list of added nodes, and attach overlays if applicable
-        return matchedNodes.then(function(nodes) {
-            boundary.pushAddedNodes(nodes);
-            if (boundary.overlays !== undefined) {
-                this.createOverlays(nodes, boundary);
-            }
-            return boundary;
-        }.bind(this));    
     }
 
     /*
         Apply all boundary functions and create overlays, if applicable.
     */
-    applyBoundaries(onLoadCallback) {
+    applyBoundaries(onLoadCallback, onCompleteCallback) {
         let observerBoundaries = [];
-        let runningBoundaries = [];
+        let runningBoundaries = 0;
         // Should always apply boundaries once on DOM load, whether or not the boundary is 'observer' type or not
         this.boundaries.forEach(function (boundary) {
 
@@ -103,32 +99,27 @@ export class BoundaryList {
             }
 
             if (hrefMatch !== null || boundary.resource === 'all') {
-                if (boundary.selectorType === 'link-query-lazy') {
-                    linkQueryLazy(boundary, document.body, this.host, this.cdxEndpoint, function(node) {
-                        this.performBoundaryAction([node], boundary);
-                        boundary.pushAddedNodes([node]);
-                        if (boundary.overlays !== undefined) {
-                            this.createOverlays([node], boundary);
-                        }
-                    }.bind(this));
-                    onLoadCallback(boundary);
+                if (boundary.type == 'observer') {
+                    observerBoundaries.push(boundary);
                 } else {
-                    if (boundary.type == 'observer') {
-                        observerBoundaries.push(boundary);
+                    // If the boundary uses lazy loading, we don't need to wait for it to finish loading
+                    // TODO: figure out a way to wait for an "initial load"
+                    if (boundary.selector.options && !boundary.selector.options['lazy-loading']) {
+                        runningBoundaries += 1;
                     }
-                    let boundaryStatus = this.applyBoundary(document.body, boundary);
-                    runningBoundaries.push(boundaryStatus);
-                    boundaryStatus.then((boundary) => {
-                        if (onLoadCallback) {
-                            onLoadCallback(boundary);
+                    let boundaryStatus = this.applyBoundary(document.body, boundary, function(boundary) {
+                        if (boundary.selector.options && !boundary.selector.options['lazy-loading']) {
+                            runningBoundaries -= 1;
+                            if (runningBoundaries == 0) {
+                                onCompleteCallback();
+                            }
                         }
-                    });       
-                }        
+                        onLoadCallback(boundary);
+                    });
+                }
             }
-            
         }.bind(this));
 
-    
         if (observerBoundaries.length > 0) {
             let observerOptions = {
                 childList: true,
@@ -138,7 +129,6 @@ export class BoundaryList {
             let observer = new MutationObserver(mutationCallback);
             observer.observe(document.body, observerOptions);
         }
-        return Promise.all(runningBoundaries).then(() => true);
     }
 
     /*

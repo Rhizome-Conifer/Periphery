@@ -70,6 +70,10 @@ function queryResource(href, host, endpoint) {
     }
 }
 
+/*
+    Builds an array of unique hrefs based on a NodeList
+    @param nodes: the NodeList from which to build the unique href list
+*/
 function buildHrefListDedup(nodes) {
     let allHref = [];
     let allHrefDedup = [];
@@ -124,7 +128,7 @@ export function linkQuery(node, _, host, endpoint, callback, options) {
                     allLinkPromises.push(queryResource(href, host, endpoint));
                 }); 
             }
-            
+
             allLinkPromises.then((nodes) => {
                 let allLinkResults = {};
                 // Build a map from hrefs to their in-boundary status
@@ -144,6 +148,6 @@ export function linkQuery(node, _, host, endpoint, callback, options) {
     }
 }
 
-export function cssSelector(node, selector) {
-    return new Promise((resolve) => {resolve(node.querySelectorAll(selector))});
+export function cssSelector(node, selector, callback) {
+    callback(node.querySelectorAll(selector));
 }

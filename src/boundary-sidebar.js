@@ -198,12 +198,16 @@ export class BoundarySidebar extends LitElement {
         this.boundariesApplied = this._boundaries.applyBoundaries(function(boundary) {
             this.boundaryElemClasses[boundary.idx].loading = false;
             this.requestUpdate();
-        }.bind(this));
+        }.bind(this), this.onComplete);
         this.requestUpdate('boundaries', oldVal);
     }
 
+    onComplete() {
+        this.boundariesApplied = true;
+    }
+
     applyBoundaries(callback) {
-        this.boundariesApplied = this._boundaries.applyBoundaries(callback);
+        this._boundaries.applyBoundaries(callback);
     } 
 
     constructor() {
