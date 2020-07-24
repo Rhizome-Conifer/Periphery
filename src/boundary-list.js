@@ -1,5 +1,5 @@
 import { Boundary } from './boundary';
-import { cssSelector, linkQuery, linkQueryLazy } from './selector';
+import { cssSelector, linkQuery } from './selector';
 import { applyStylesToNodes, attachDivOverlay } from './mutator';
 
 export class BoundaryList {
@@ -70,6 +70,7 @@ export class BoundaryList {
             matchedNodes = inlineStyle(document.head, boundary.actionStyle, boundary.selector);
         } else {
             matchedNodes = selectorFuncs[boundary.selectorType](node, boundary.selector, this.host, this.cdxEndpoint).then(function(nodes) {
+                if (nodes !== null)
                 return this.performBoundaryAction(nodes, boundary);
             }.bind(this));
         }

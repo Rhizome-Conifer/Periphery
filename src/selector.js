@@ -30,7 +30,7 @@ function getLinkQueryCallback(host, endpoint, pool, queryResults, otherCallback)
                 queryResults[href].then((res) => {
                     let isPresent = res[1]
                     if (!isPresent) {
-                        otherCallback(elem);
+                        otherCallback([elem]);
                     }
                 })
             } else {
@@ -38,7 +38,7 @@ function getLinkQueryCallback(host, endpoint, pool, queryResults, otherCallback)
                 queryResults[href] = result.then((res) => {
                     let isPresent = res[1];
                     if (!isPresent) {
-                        otherCallback(elem);
+                        otherCallback([elem]);
                     }
                     return isPresent;
                 })
@@ -86,7 +86,7 @@ function buildHrefListDedup(nodes) {
 /*
     Selects all elements with href attribute and queries whether they point to an in-boundary resource
 */
-export function linkQuery(node, _, host, endpoint, options) {
+export function linkQuery(node, _, host, endpoint, callback, options) {
     if (node && node.nodeType === Node.ELEMENT_NODE) {
         let allHrefNodes = node.querySelectorAll('[href]');
         let allHrefsDedup = buildHrefListDedup(allHrefNodes);
@@ -124,7 +124,8 @@ export function linkQuery(node, _, host, endpoint, options) {
                     allLinkPromises.push(queryResource(href, host, endpoint));
                 }); 
             }
-            return allLinkPromises.then((nodes) => {
+            
+            allLinkPromises.then((nodes) => {
                 let allLinkResults = {};
                 // Build a map from hrefs to their in-boundary status
                 nodes.forEach(function (node) {
@@ -137,7 +138,7 @@ export function linkQuery(node, _, host, endpoint, options) {
                         filteredNodes.push(node);
                     }
                 })
-                return filteredNodes;
+                callback(filteredNodes);
             })
         }
     }
