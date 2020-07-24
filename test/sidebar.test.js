@@ -45,13 +45,17 @@ export function sidebarTestRunner() {
             testHref.href = elemHref;
             testHref.id = TEST_HREF;
             document.body.appendChild(testHref);
-        })
+        });
 
         afterEach(() => {
             document.getElementById(TEST_DIV).remove();
             document.getElementById(TEST_HREF).remove();
             document.body.querySelector('boundary-sidebar').remove();
-        })      
+        });      
+
+        afterAll(() => {
+            global.fetch.mockReset(); 
+        })
     
         test('renders boundary list divs correctly', () => {
             let sidebar = document.createElement('boundary-sidebar');
@@ -100,18 +104,18 @@ export function sidebarTestRunner() {
             }];
 
             const mockSuccessResponse = {'test': 'response'};
-            const mockJsonPromise = Promise.resolve(mockSuccessResponse); // 2
-            const mockFetchPromise = Promise.resolve({ // 3
+            const mockJsonPromise = Promise.resolve(mockSuccessResponse);
+            const mockFetchPromise = Promise.resolve({ 
                 text: () => mockJsonPromise,
             });
-            jest.spyOn(global, 'fetch').mockImplementation(() => mockFetchPromise); // 4
+            jest.spyOn(global, 'fetch').mockImplementation(() => mockFetchPromise); 
 
             let sidebar = document.createElement('boundary-sidebar');
             document.body.appendChild(sidebar);
             sidebar.boundaries = hrefBoundary;
             return sidebar.boundariesApplied.then(() => {
                 let testDiv = document.querySelector('#' + TEST_HREF);
-                expect(testDiv.style.pointerEvents).toEqual('');    
+                expect(testDiv.style.pointerEvents).toEqual('');   
             })
         })
 

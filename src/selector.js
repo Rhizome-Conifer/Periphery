@@ -5,7 +5,7 @@ import { Pool } from './worker-pool';
     @param callback: the callback function to be called on each intersected element
     @param unobserveCallback: the callback to stop observing a given target element
 */
-function getIntersectionCallback(callback, unobserveCallback) {
+export function getIntersectionCallback(callback, unobserveCallback) {
     return function(entries) {
         let elem = entries[0];
         // If there is no intersection, do nothing
@@ -21,7 +21,7 @@ function getIntersectionCallback(callback, unobserveCallback) {
     @param queryResults: an Object mapping from href values to their in-boundary status
     @param otherCallback: an upstream callback to be called on each out-of-boundary element
 */
-function getLinkQueryCallback(host, endpoint, pool, queryResults, otherCallback) {
+export function getLinkQueryCallback(host, endpoint, pool, queryResults, otherCallback) {
     return function(elem) {
         if (elem.href !== undefined) {
             let href = elem.href;
@@ -49,7 +49,7 @@ function getLinkQueryCallback(host, endpoint, pool, queryResults, otherCallback)
 /*
     Determine whether a given backend CDX query returns a result.
 */
-function checkCdxQueryResult(uri) {
+export function checkCdxQueryResult(uri) {
     return fetch(uri).then
     (res => res.text()).then
     (response => response != '');
@@ -59,13 +59,13 @@ function checkCdxQueryResult(uri) {
     Queries backend CDX server to determine whether a given resource exists in the archive.
     link: A Node containing the href to check
 */
-function queryResource(href, host, endpoint) {
+export function queryResource(href, host, endpoint) {
     if (!href.startsWith('javascript')) {
         let url = host + endpoint + "?output=json&limit=1&url=" + encodeURIComponent(href);
-        return [href, checkCdxQueryResult(url)];
+        return checkCdxQueryResult(url).then((val) => [href, val]);
     } else {
         // for javascript() hrefs and other things that we know aren't within boundary
-        return new Promise((resolve) => resolve([href, false]));
+        return Promise.resolve([href, false]);
     }
 }
 
@@ -73,7 +73,7 @@ function queryResource(href, host, endpoint) {
     Builds an array of unique hrefs based on a NodeList
     @param nodes: the NodeList from which to build the unique href list
 */
-function buildHrefListDedup(nodes) {
+export function buildHrefListDedup(nodes) {
     let allHref = [];
     let allHrefDedup = [];
     nodes.forEach(function(node) {
