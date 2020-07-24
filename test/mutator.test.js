@@ -43,7 +43,7 @@ export function mutatorTestRunner() {
                 let content = window.getComputedStyle(innerDiv, ':after').getPropertyValue('content');
                 expect(content).toEqual('\"test\"');
             })
-        })
+        });
 
     });
 }
