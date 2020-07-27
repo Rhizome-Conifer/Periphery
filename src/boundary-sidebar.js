@@ -195,16 +195,22 @@ export class BoundarySidebar extends LitElement {
             this.boundaryDefaultOverlays[boundary.idx] = false;
         })
         
-        this.boundariesApplied = this._boundaries.applyBoundaries(function(boundary) {
-            this.boundaryElemClasses[boundary.idx].loading = false;
-            this.requestUpdate();
-        }.bind(this));
+        this.boundariesApplied = new Promise((res) => {
+            this._boundaries.applyBoundaries(
+                function(boundary) {
+                    this.boundaryElemClasses[boundary.idx].loading = false;
+                }.bind(this), 
+                function() {
+                    // Wait for initial update, because some 
+                    this.updateComplete.then(() => {
+                        this.requestUpdate();
+                        res(true);    
+                    })
+                }.bind(this)
+            );
+        });
         this.requestUpdate('boundaries', oldVal);
     }
-
-    applyBoundaries(callback) {
-        this.boundariesApplied = this._boundaries.applyBoundaries(callback);
-    } 
 
     constructor() {
         super();
@@ -259,7 +265,7 @@ export class BoundarySidebar extends LitElement {
     */
     defaultOverlays(boundary) {
         let sidebarDiv = this.shadowRoot.querySelector('#boundary-sidebar');
-        if (boundary.affectedNodes !== undefined && sidebarDiv != null) {
+        if (boundary.affectedNodes !== undefined && sidebarDiv !== null) {
             let boundaryRect = sidebarDiv.getBoundingClientRect();
             return html`
                 ${boundary.affectedNodes.map((node) => {

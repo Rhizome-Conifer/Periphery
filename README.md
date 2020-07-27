@@ -121,7 +121,7 @@ Now, run:
 $ npx run webpack
 $ wayback
 ```
-and visit `localhost:8080.` If you visit a page for the collection you included the `metadata.yaml` in, you should see the boundary sidebar and the boundaries functioning correctly.
+and visit `localhost:8080`. If you visit a page for the collection you included the `metadata.yaml` in, you should see the boundary sidebar and the boundaries functioning correctly.
 
 
 

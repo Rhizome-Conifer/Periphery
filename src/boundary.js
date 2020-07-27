@@ -23,6 +23,7 @@ export class Boundary {
         }
         this.selectorType = boundary.selector.type;
         this.selector = boundary.selector.query;
+        this.selectorOptions = boundary.selector.options;
 
         if (boundary.action === undefined) {
             throw new TypeError('Boundary action not provided.')
