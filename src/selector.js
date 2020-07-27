@@ -106,9 +106,9 @@ export function linkQuery(node, _, callback, host, endpoint, boundaryOptions) {
         if (options['lazy-loading']) {
             let allLinkResults = {};
             let queryCallback = getLinkQueryCallback(host, endpoint, pool, allLinkResults, callback);
+            // Add margin to intersection observer so boundaries load slightly before they're in view
             let observerOptions = {
-                rootMargin: '15px',
-                threshold: 0.1
+                rootMargin: '15px'
             }
     
             allHrefNodes.forEach(function(node) {
@@ -130,7 +130,10 @@ export function linkQuery(node, _, callback, host, endpoint, boundaryOptions) {
                 }); 
             }
 
+            console.log(allLinkPromises);
+
             Promise.all(allLinkPromises).then((nodes) => {
+                console.log(nodes);
                 let allLinkResults = {};
                 // Build a map from hrefs to their in-boundary status
                 nodes.forEach(function (node) {

@@ -118,7 +118,7 @@ class WorkerThread {
     run(task) {
         // On worker finish, call the callback and free the worker thread
         this.worker.onmessage = (val) => {
-            task.callback(val);
+            task.callback(val.data);
             this.freeThread(this);
         }
         this.worker.postMessage({host: this.host, endpoint: this.endpoint, href: task.message});
