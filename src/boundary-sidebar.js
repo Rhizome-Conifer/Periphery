@@ -402,31 +402,30 @@ export class BoundarySidebar extends LitElement {
                 <ul id="boundary-list">
                     ${this._boundaries.boundaries === undefined ? html`` : this._boundaries.boundaries.map((boundary) => 
                         {
-                         return    
-                        }
-                        html`<li class="${classMap(this.boundaryElemClasses[boundary.idx])}" 
-                                tabindex="1" 
-                                @mouseenter=${(e) => {this.handleBoundaryMouse(boundary, true)}} 
-                                @mouseleave=${(e) => {this.handleBoundaryMouse(boundary, false)}}
-                                @focus=${(e) => this.handleBoundaryFocus(boundary, true)}
-                                @blur=${(e) => this.handleBoundaryFocus(boundary, false)}
-                                >
-                            <div class="boundary-title">${boundary.action}</div>
-                            <div class="boundary-description">${boundary.description}</div>
-                            <div class="boundary-contents">
-                                ${boundary.overlays == undefined ? html`` : this.overlayList(boundary)}
-                                <div class="overlay-root">
-                                    ${this.defaultOverlays(boundary)}
-                                </div>
-                            </div>
-                            ${this.boundaryElemClasses[boundary.idx].loading ? html`
-                                <div class="loader-container">
-                                    <div class="loader">
-                                        Loading...
+                         return boundary.resource === 'all' || matchWindowLocation(boundary.resource) ?  
+                            html`<li class="${classMap(this.boundaryElemClasses[boundary.idx])}" 
+                                    tabindex="1" 
+                                    @mouseenter=${(e) => {this.handleBoundaryMouse(boundary, true)}} 
+                                    @mouseleave=${(e) => {this.handleBoundaryMouse(boundary, false)}}
+                                    @focus=${(e) => this.handleBoundaryFocus(boundary, true)}
+                                    @blur=${(e) => this.handleBoundaryFocus(boundary, false)}
+                                    >
+                                <div class="boundary-title">${boundary.action}</div>
+                                <div class="boundary-description">${boundary.description}</div>
+                                <div class="boundary-contents">
+                                    ${boundary.overlays == undefined ? html`` : this.overlayList(boundary)}
+                                    <div class="overlay-root">
+                                        ${this.defaultOverlays(boundary)}
                                     </div>
                                 </div>
-                            ` : html``}
-                        </li>`)}
+                                ${this.boundaryElemClasses[boundary.idx].loading ? html`
+                                    <div class="loader-container">
+                                        <div class="loader">
+                                            Loading...
+                                        </div>
+                                    </div>
+                                ` : html``}
+                            </li>` : html``})}
                 </ul>
             </div>    
         </div>`;
