@@ -37,12 +37,12 @@ export class BoundaryList {
             nodes.forEach(function (node) {
                 let overlayDiv = attachDivOverlay(node, className, desc, overlay.styles);
                 boundary.overlayDivs[overlayId].push(overlayDiv);
+                if (overlay.display == 'visible') {
+                    overlayDiv.style.display = 'visible';
+                } 
                 node.style.position = 'relative';
             });   
 
-            if (overlay.display == 'visible') {
-                boundary.showOverlays(overlayId);
-            } 
         });
     }
 
