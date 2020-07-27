@@ -224,6 +224,7 @@ export class BoundarySidebar extends LitElement {
                 this.hidden = true;
             }
         }
+        this.requestUpdate();
     }
 
     constructor() {
@@ -240,7 +241,7 @@ export class BoundarySidebar extends LitElement {
         this.postMessageOrigin = window.origin;
 
         window.addEventListener("message", this.handlePostMessage.bind(this), false);
-        window.addEventListener('keydown', this.handleKeyInput, false);
+        window.addEventListener('keydown', this.handleKeyInput.bind(this), false);
     }    
     
     /*
@@ -355,7 +356,9 @@ export class BoundarySidebar extends LitElement {
                                         this.requestUpdate();
                                     }}
                     @click = ${(e) => this.onCheck(e.target, boundary, overlayId)}
-                    id=${overlayId}>
+                    id=${overlayId}
+                    ?disabled=${!this.editable}
+                    >
                 </input>
             </div>
         `})}`;
