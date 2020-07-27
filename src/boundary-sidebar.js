@@ -3,6 +3,7 @@ import {classMap} from 'lit-html/directives/class-map';
 import {styleMap} from 'lit-html/directives/style-map';
 
 import {BoundaryList} from './boundary-list'
+import {matchWindowLocation} from './selector';
 
 export class BoundarySidebar extends LitElement {
     static get styles() {
@@ -400,6 +401,9 @@ export class BoundarySidebar extends LitElement {
                 <h1 class="sidebar-title">${this.title || 'Object Boundaries'}</h1>
                 <ul id="boundary-list">
                     ${this._boundaries.boundaries === undefined ? html`` : this._boundaries.boundaries.map((boundary) => 
+                        {
+                         return    
+                        }
                         html`<li class="${classMap(this.boundaryElemClasses[boundary.idx])}" 
                                 tabindex="1" 
                                 @mouseenter=${(e) => {this.handleBoundaryMouse(boundary, true)}} 

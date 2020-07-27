@@ -155,3 +155,11 @@ export function linkQuery(node, _, callback, host, endpoint, boundaryOptions) {
 export function cssSelector(node, selector, callback) {
     callback(node.querySelectorAll(selector));
 }
+
+export function matchWindowLocation(href) {
+    let hrefMatch = null;
+    let wildcardVal = href.indexOf('*') === -1 ? '$' : ''; 
+    let re = new RegExp(href + wildcardVal);
+    hrefMatch = window.location.href.match(re);
+    return hrefMatch !== null;
+}

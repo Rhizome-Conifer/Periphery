@@ -1,5 +1,5 @@
 import { Boundary } from './boundary';
-import { cssSelector, linkQuery } from './selector';
+import { cssSelector, linkQuery, matchWindowLocation } from './selector';
 import { applyStylesToNodes, attachDivOverlay } from './mutator';
 
 export class BoundaryList {
@@ -89,16 +89,7 @@ export class BoundaryList {
         // Should always apply boundaries once on DOM load, whether or not the boundary is 'observer' type or not
         this.boundaries.forEach(function (boundary) {
 
-            let hrefMatch = null;
-            if (boundary.resource !== 'all') {
-                // If the resource string doesn't contain a wildcard, we want to match the string exactly
-                // Note that we can't match the beginning of the string because of URL rewriting
-                let wildcardVal = boundary.resource.indexOf('*') === -1 ? '$' : ''; 
-                let re = new RegExp(boundary.resource + wildcardVal);
-                hrefMatch = window.location.href.match(re);
-            }
-
-            if (hrefMatch !== null || boundary.resource === 'all') {
+            if (boundary.resource === 'all' || matchWindowLocation(boundary.resource)) {
                 if (boundary.type == 'observer') {
                     observerBoundaries.push(boundary);
                 } else {
