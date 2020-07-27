@@ -266,12 +266,14 @@ export class BoundarySidebar extends LitElement {
     /*
         Handle onclick for boundary visibility checkbox
     */
-    onCheck(elem, boundary, overlayId) {
+    onCheck(elem, boundary, overlayId, idx) {
         // TODO migrate this method to new LitElement format
         if (elem.checked) {
-            boundary.showOverlays(overlayId);
+            boundary.overlays[idx].visible = false;
+            boundary.updateOverlays(overlayId, false);
         } else {
-            boundary.hideOverlays(overlayId);
+            boundary.overlays[idx].visible = true;
+            boundary.updateOverlays(overlayId, true);
         }
     }
     
@@ -357,7 +359,7 @@ export class BoundarySidebar extends LitElement {
                                         this.boundaryElemClasses[boundary.idx].focus = false;
                                         this.requestUpdate();
                                     }}
-                    @click = ${(e) => this.onCheck(e.target, boundary, overlayId)}
+                    @click = ${(e) => this.onCheck(e.target, boundary, overlayId, idx)}
                     id=${overlayId}
                     ?disabled=${!this.editable}
                     >

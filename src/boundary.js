@@ -62,20 +62,11 @@ export class Boundary {
     }
 
     /*
-        Show all overlay elements matching a given overlay ID.
+        Update the visibility of all overlay elements matching a given overlay ID.
     */
-    showOverlays(overlayId) {
+    updateOverlays(overlayId, visibility) {
         this.overlayDivs[overlayId].forEach(function(overlayDiv) {
-            overlayDiv.style.visibility = 'visible';
-        })
-    }
-
-    /*
-        Hide all overlay elements matching a given overlay ID.
-    */
-    hideOverlays(overlayId) {
-        this.overlayDivs[overlayId].forEach(function(overlayDiv) {
-            overlayDiv.style.visibility = 'hidden';
+            overlayDiv.style.visibility = visibility ? 'visible' : hidden;
         })
     }
 }
