@@ -66,7 +66,7 @@ export class Boundary {
     */
     updateOverlays(overlayId, visibility) {
         this.overlayDivs[overlayId].forEach(function(overlayDiv) {
-            overlayDiv.style.visibility = visibility ? 'visible' : hidden;
+            overlayDiv.style.visibility = visibility ? 'visible' : 'hidden';
         })
     }
 }
