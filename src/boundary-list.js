@@ -50,7 +50,9 @@ export class BoundaryList {
         if (boundary.action == 'disable') {
             boundary.actionStyle = {'pointer-events': 'none'};
         }
-        applyStylesToNodes(nodes, boundary.actionStyle);
+        if (boundary.action !== 'none') {
+            applyStylesToNodes(nodes, boundary.actionStyle);
+        }
         return nodes;
     }
 
