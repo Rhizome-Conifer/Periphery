@@ -155,8 +155,11 @@ Boundaries must be valid JSON objects. The specification for boundaries is as fo
 [{
     "resource": "all" | <resource URL> | <URL prefix with wildcard>,
     "selector": {
-        "type": "css-selector" | "link-query" | "element-selector",
-        "query" (optional): <CSS selector> 
+        "type": "css-selector" | "link-query",
+        "query" (optional): <CSS selector>,
+        "options" (optional):
+          "worker": true | false,
+          "lazy-loading": true | false 
     },
     "type": "on-load" | "mutation-observer",
     "action": {
