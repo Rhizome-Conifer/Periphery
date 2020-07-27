@@ -181,6 +181,7 @@ export class BoundarySidebar extends LitElement {
             boundariesApplied: {attribute: false},
             hidden: {attribute: true},
             editable: {attribute: true},
+            toggle: {attribute: true},
             postMessageOrigin: {attribute: 'post-message-origin'},
             hostPrefix: {attribute: 'host-prefix'},
             cdxEndpoint: {attribute: 'cdx-endpoint'}
@@ -214,7 +215,7 @@ export class BoundarySidebar extends LitElement {
     }
 
     handleKeyInput(e) {
-        if(e.key == 'I' && e.ctrlKey) {
+        if(e.key == 'I' && e.ctrlKey && this.toggle) {
             if (this.hidden) {
                 this.hidden = false;
             } else if (!this.editable) {
@@ -238,6 +239,7 @@ export class BoundarySidebar extends LitElement {
         this.styles = {};
         this.hidden = false;
         this.editable = false;
+        this.toggle = true;
         this.postMessageOrigin = window.origin;
 
         window.addEventListener("message", this.handlePostMessage.bind(this), false);

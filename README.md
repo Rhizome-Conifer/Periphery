@@ -110,11 +110,13 @@ Notice that this script refers to `meta`, which is a variable that doesn't exist
     {% if metadata.boundaries != undefined %}
       var meta = {{ metadata.boundaries }};
     {% endif %}
-    var host = "{{ host_prefix }}/{{ coll }}/";
 </script>
 <script type="module" src="{{ host_prefix }}/static/index.js" ></script>
-<boundary-sidebar></boundary-sidebar>
+<boundary-sidebar
+  host-prefix={{host_prefix}}/{{coll}}
+></boundary-sidebar>
 ```
+Here, the `host-prefix` attribute, which specifies the host to query for backend CDX requests (see `Attributes`), is set to a value that is set on the backend and injected when the template is rendered.
 
 Now, run:
 ```
@@ -123,16 +125,28 @@ $ wayback
 ```
 and visit `localhost:8080`. If you visit a page for the collection you included the `metadata.yaml` in, you should see the boundary sidebar and the boundaries functioning correctly.
 
+## UI Controls
 
+By default, the sidebar UI can be toggled through different "views" using the keyboard shortcut (Ctrl-Shift-I): hidden, sidebar viewable, and sidebar "editable" (i.e. the properties of the boundary can be changed from the sidebar, see below in the `Attributes` section).
 
 ## Attributes
 
 **hidden:** hides the sidebar UI. Boundaries will still be applied and the DOM of the replayed
-resource will still be modified.
+resource will still be modified. Defaults to `false`.
+
+**editable:** Determines whether the boundary properties (overlay visibility, etc.) can be modified from the sidebar panel. Defaults to `false`.
+
+**toggle:** Enables toggling of editablility with keyboard shortcuts. Defaults to `true`.
 
 **post-message-origin:** Specifies the origin from which to accept postMessage messages (see the postMessage section below for more information). 
 By default, the sidebar only accepts `postMessage`s from the same origin, so if the replayed page is contained in an `iframe` with a different origin,
-`post-message-origin` must be set in order for the component to accept messages.
+`post-message-origin` must be set in order for the component to accept messages. Defaults to `window.origin` (i.e. only accepting same-origin messages).
+
+**host-prefix:** The hostname to query on the backend for CDX queries.
+
+**cdx-endpoint:** The specific endpoint to hit for backend queries. Defaults to `/cdx`.
+
+
 
 ## Boundary Spec
 
