@@ -38,6 +38,11 @@ export class BoundarySidebar extends LitElement {
                 font-weight: bold;
                 cursor: pointer;
             }
+
+            .sidebar-title {
+                margin: 10px;
+                font-size: 20px;
+            }
       
             .sidebar-toggle-icon {
                 position: fixed;
@@ -182,6 +187,7 @@ export class BoundarySidebar extends LitElement {
             hidden: {attribute: true},
             editable: {attribute: true},
             toggle: {attribute: true},
+            title: {attribute: true},
             postMessageOrigin: {attribute: 'post-message-origin'},
             hostPrefix: {attribute: 'host-prefix'},
             cdxEndpoint: {attribute: 'cdx-endpoint'}
@@ -391,6 +397,7 @@ export class BoundarySidebar extends LitElement {
                 <div class="sidebar-check">i</div>
             </label>
             <div id="boundary-sidebar">
+                <h1 class="sidebar-title">${this.title || 'Object Boundaries'}</h1>
                 <ul id="boundary-list">
                     ${this._boundaries.boundaries === undefined ? html`` : this._boundaries.boundaries.map((boundary) => 
                         html`<li class="${classMap(this.boundaryElemClasses[boundary.idx])}" 
