@@ -4,8 +4,7 @@
   "description": "",
   "main": "src/boundary-sidebar.js",
   "dependencies": {
-    "lit-element": "^2.3.1",
-    "workerpool": "^6.0.0"
+    "lit-element": "^2.3.1"
   },
   "devDependencies": {
     "html-webpack-plugin": "^4.3.0",
@@ -13,8 +12,7 @@
     "jest-electron": "^0.1.11",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0",
-    "worker-loader": "^2.0.0"
+    "webpack-dev-server": "^3.11.0"
   },
   "scripts": {
     "webpack:test": "webpack --config test/webpack.test.config.js --display-error-details",
