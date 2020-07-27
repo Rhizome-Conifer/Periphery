@@ -142,7 +142,7 @@ export class BoundarySidebar extends LitElement {
                 height: 10px;
             }
             .loader {
-                margin: 10px auto;
+                margin: 11px auto;
                 font-size: 10px;
                 position: relative;
                 text-indent: -9999em;
@@ -208,9 +208,9 @@ export class BoundarySidebar extends LitElement {
             this._boundaries.applyBoundaries(
                 function(boundary) {
                     this.boundaryElemClasses[boundary.idx].loading = false;
+                    this.requestUpdate();
                 }.bind(this), 
                 function() {
-                    // Wait for initial update, because some 
                     this.updateComplete.then(() => {
                         this.requestUpdate();
                         res(true);    
@@ -295,6 +295,7 @@ export class BoundarySidebar extends LitElement {
             let boundaryRect = sidebarDiv.getBoundingClientRect();
             return html`
                 ${boundary.affectedNodes.map((node) => {
+                    // TODO: fix this so it doesn't rely on the bounding rect, because that is an anti-pattern
                     let rect = node.getBoundingClientRect();
                     let styles = {
                         width: rect.width + 'px',
