@@ -180,6 +180,7 @@ export class BoundarySidebar extends LitElement {
             boundaryDefaultOverlays: {attribute: false},
             boundariesApplied: {attribute: false},
             hidden: {attribute: true},
+            editable: {attribute: true},
             postMessageOrigin: {attribute: 'post-message-origin'},
             hostPrefix: {attribute: 'host-prefix'},
             cdxEndpoint: {attribute: 'cdx-endpoint'}
@@ -212,6 +213,19 @@ export class BoundarySidebar extends LitElement {
         this.requestUpdate('boundaries', oldVal);
     }
 
+    handleKeyInput(e) {
+        if(e.key == 'I' && e.ctrlKey) {
+            if (this.hidden) {
+                this.hidden = false;
+            } else if (!this.editable) {
+                this.editable = true;
+            } else {
+                this.editable = false;
+                this.hidden = true;
+            }
+        }
+    }
+
     constructor() {
         super();
         this._boundaries = [];
@@ -222,9 +236,11 @@ export class BoundarySidebar extends LitElement {
         this.cdxEndpoint = '/cdx';
         this.styles = {};
         this.hidden = false;
+        this.editable = false;
         this.postMessageOrigin = window.origin;
 
         window.addEventListener("message", this.handlePostMessage.bind(this), false);
+        window.addEventListener('keydown', this.handleKeyInput, false);
     }    
     
     /*
