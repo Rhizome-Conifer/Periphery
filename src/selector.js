@@ -130,10 +130,7 @@ export function linkQuery(node, _, callback, host, endpoint, boundaryOptions) {
                 }); 
             }
 
-            console.log(allLinkPromises);
-
             Promise.all(allLinkPromises).then((nodes) => {
-                console.log(nodes);
                 let allLinkResults = {};
                 // Build a map from hrefs to their in-boundary status
                 nodes.forEach(function (node) {

@@ -33,12 +33,11 @@ export class BoundaryList {
             if (boundary.overlayDivs[overlayId] === undefined) {
                 boundary.overlayDivs[overlayId] = [];
             }
-
             nodes.forEach(function (node) {
                 let overlayDiv = attachDivOverlay(node, className, desc, overlay.styles);
                 boundary.overlayDivs[overlayId].push(overlayDiv);
-                if (overlay.display == 'visible') {
-                    overlayDiv.style.display = 'visible';
+                if (overlay.display !== 'visible') {
+                    overlayDiv.style.visibility = 'hidden';
                 } 
                 node.style.position = 'relative';
             });   
