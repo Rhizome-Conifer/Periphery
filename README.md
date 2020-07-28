@@ -215,3 +215,7 @@ Messages with a `type` of `styles` allow you to apply custom styling and appeara
 The styles should be formatted with the keys as strings representing valid CSS selectors, and the values
 as objects with keys representing CSS attributes and values as CSS attribute values, as in the above example.
 
+## Credits
+
+The frontend UI design is based on Lozana Rossenova's sidebar prototype for Webenact, which can be found [here](https://lozanaross.github.io/artbase-prototype/webenact-template.html).
+
