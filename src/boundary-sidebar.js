@@ -185,10 +185,11 @@ export class BoundarySidebar extends LitElement {
             boundaryElemClasses: {attribute: false},
             boundaryDefaultOverlays: {attribute: false},
             boundariesApplied: {attribute: false},
-            hidden: {attribute: true},
+            hidden: {attribute: true, type: Boolean},
             editable: {attribute: true},
-            toggle: {attribute: true},
+            toggle: {attribute: true, type: Boolean},
             title: {attribute: true},
+            embedded: {attribute: true, type: Boolean},
             postMessageOrigin: {attribute: 'post-message-origin'},
             hostPrefix: {attribute: 'host-prefix'},
             cdxEndpoint: {attribute: 'cdx-endpoint'}
@@ -389,48 +390,56 @@ export class BoundarySidebar extends LitElement {
         return styleString;
     }
 
+    getSidebarContents() {
+        return html`
+        <h1 class="sidebar-title">${this.title || 'Object Boundaries'}</h1>
+        <ul id="boundary-list">
+            ${this._boundaries.boundaries === undefined ? html`` : this._boundaries.boundaries.map((boundary) => 
+                {
+                    return boundary.resource === 'all' || matchWindowLocation(boundary.resource) ?  
+                    html`<li class="${classMap(this.boundaryElemClasses[boundary.idx])}" 
+                            tabindex="1" 
+                            @mouseenter=${(e) => {this.handleBoundaryMouse(boundary, true)}} 
+                            @mouseleave=${(e) => {this.handleBoundaryMouse(boundary, false)}}
+                            @focus=${(e) => this.handleBoundaryFocus(boundary, true)}
+                            @blur=${(e) => this.handleBoundaryFocus(boundary, false)}
+                            >
+                        <div class="boundary-title">action: ${boundary.action}</div>
+                        <div class="boundary-description">${boundary.description}</div>
+                        <div class="boundary-contents">
+                            ${boundary.overlays == undefined ? html`` : this.overlayList(boundary)}
+                            <div class="overlay-root">
+                                ${this.defaultOverlays(boundary)}
+                            </div>
+                        </div>
+                        ${this.boundaryElemClasses[boundary.idx].loading ? html`
+                            <div class="loader-container">
+                                <div class="loader">
+                                    Loading...
+                                </div>
+                            </div>
+                        ` : html``}
+                    </li>` : html``})}
+        </ul>`;
+    }
+
     render() {
         return html`
         <style>
             ${this.getExternalStyle()}
         </style>
-        <div id="sidebar-container" style=${styleMap({'visibility': this.hidden ? 'hidden' : 'visible'})}>
-            <input type="checkbox" id="sidebar-toggle">
-            <label for="sidebar-toggle" class="sidebar-toggle-icon">
-                <div class="sidebar-check">i</div>
-            </label>
-            <div id="boundary-sidebar">
-                <h1 class="sidebar-title">${this.title || 'Object Boundaries'}</h1>
-                <ul id="boundary-list">
-                    ${this._boundaries.boundaries === undefined ? html`` : this._boundaries.boundaries.map((boundary) => 
-                        {
-                         return boundary.resource === 'all' || matchWindowLocation(boundary.resource) ?  
-                            html`<li class="${classMap(this.boundaryElemClasses[boundary.idx])}" 
-                                    tabindex="1" 
-                                    @mouseenter=${(e) => {this.handleBoundaryMouse(boundary, true)}} 
-                                    @mouseleave=${(e) => {this.handleBoundaryMouse(boundary, false)}}
-                                    @focus=${(e) => this.handleBoundaryFocus(boundary, true)}
-                                    @blur=${(e) => this.handleBoundaryFocus(boundary, false)}
-                                    >
-                                <div class="boundary-title">${boundary.action}</div>
-                                <div class="boundary-description">${boundary.description}</div>
-                                <div class="boundary-contents">
-                                    ${boundary.overlays == undefined ? html`` : this.overlayList(boundary)}
-                                    <div class="overlay-root">
-                                        ${this.defaultOverlays(boundary)}
-                                    </div>
-                                </div>
-                                ${this.boundaryElemClasses[boundary.idx].loading ? html`
-                                    <div class="loader-container">
-                                        <div class="loader">
-                                            Loading...
-                                        </div>
-                                    </div>
-                                ` : html``}
-                            </li>` : html``})}
-                </ul>
-            </div>    
-        </div>`;
+        ${this.embedded ? this.getSidebarContents() : 
+            html`
+            <div id="sidebar-container" style=${styleMap({'visibility': this.hidden ? 'hidden' : 'visible'})}>
+                <input type="checkbox" id="sidebar-toggle">
+                <label for="sidebar-toggle" class="sidebar-toggle-icon">
+                    <div class="sidebar-check">i</div>
+                </label>
+                <div id="boundary-sidebar">
+                    ${this.getSidebarContents()}
+                </div>    
+            </div>
+        `}`;
     }
 }
 
