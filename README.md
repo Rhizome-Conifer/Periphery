@@ -150,44 +150,70 @@ By default, the sidebar only accepts `postMessage`s from the same origin, so if 
 
 ## Boundary Spec
 
-Boundaries must be valid JSON objects. The specification for boundaries is as follows (note that boundaries should be enclosed in an array, even if there is only one):
+Boundaries must be valid YAML/JSON objects. The specification for boundaries is as follows (YAML is the default format, but should be converted to JSON):
 ```
-[{
-    "resource": "all" | <resource URL> | <URL prefix with wildcard>,
-    "selector": {
-        "type": "css-selector" | "link-query",
-        "query" (optional): <CSS selector>,
-        "options" (optional):
-          "worker": true | false,
-          "lazy-loading": true | false 
-    },
-    "type": "on-load" | "mutation-observer",
-    "action": {
-        "type": "none" | "disable" | "style"
-        "styles" (optional): {
-            <property>: <value>
-        }
-    },
-    "overlay" (optional): {
-        "box": {
-            "display": "none" | "visible",
-            "styles" (optional): {
-                <property>: <value>
-            }
-        },
-        "tooltip": {
-            "display": "none" | "visible",
-            "styles" (optional): {
-                <property>: <value>
-            }
-        }
-    },
-    "description": <boundary description>
-}]
+- 
+  resource: all | <resource URL> | <resource URL prefix with wildcard>
+  selector:
+    type: css-selector | link-query
+    query (optional): <CSS selector>
+    options (optional):
+      worker: true | false
+      lazy-loading: true | false
+  type: on-load | mutation-observer
+  action:
+    type: none | disable | style
+    styles (optional): 
+      <CSS property>: <value>
+      ...
+  overlay (optional):
+    box: 
+      display: none | visible
+      styles (optional):
+        <CSS property>: <value>
+        ...
+    tooltip: 
+      display: none | visible
+      styles (optional):
+        <CSS property>: <value>
+        ... 
+  description: <boundary description>
 ```
-### Resource Matching
+
+## Boundary Expression Properties
+
+### resource 
 
 The `resource` property of a boundary can be used to specify specific pages to which a boundary should be applied. The `all` option will apply the boundary to all pages; alternatively, you can specify a particular URL to match, optionally using a wildcard character (`*`) to match a range of pages. For instance, `resource: http://test.site/user` will match only that exact URL, but `resource: http://test.site/*` will match all pages on that domain. Wildcards are also useful for resources that include `GET` request parameters in the URL, so, `http://test.site/user*` will match `http://test.site/user?id=1234`, etc.
+
+### selector
+
+`selector` determines how elements on a page should be chosen to be modified. A `type` of `link-query` will collect all elements with an `href` attribute, and query the backend CDX API (location specified by the `cdx-endpoint` attribute) to determine which `href`s point to in-boundary resources. `css-selector` will simply perform a query on the page (specifically, `document.body`) using the CSS selector defined by `query`.
+
+The options, `worker` and `lazy-loading`, are primarily for improving the performance of `link-query` selectors. `worker` batches the backend CDX queries with [web workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API), which also limits the number of backend queries that can be made at one time. **It is highly recommended that this option be used for pages that contain many links, in order to avoid performing too many backend queries at once.** The `lazy-loading` option is another performance improvement; enabling it causes elements to only be queried when they enter the viewport, which means (depending on page layout) fewer queries will need to be performed at once.
+
+### type
+
+The `type` property determines when queries and actions will be performed. `on-load`, the default option, will apply boundary expressions only when the DOM initially loads. However, if a page adds relevant elements to the DOM later on, based on user input or something similar, the `mutation-observer` option will query all new nodes as they're added to the DOM and perform boundary expression on them.
+
+### action
+
+`action` determines how elements matched by the `selector` are modified. `none`, obviously, does nothing; `disable` (the default option) will disable link functionality by setting `pointer-events: none` on elements; and `style` allows for the application of arbitrary CSS styling. if `type` is `style`, then the `styles` property can be set to an arbitrary set of CSS styles, e.g.
+
+```
+  styles:
+    background-color: #ff0000
+    width: 50px
+    ...
+```
+
+### overlay
+
+The `overlay` property determines how elements matched by `selector` are overlaid. The properties `box` and `tooltip` are both optional, and if present will generate an overlay of their respective type. The `display` property determines whether the overlay is visible by default, and `styles`, as with in the `action` property, allows for the application of arbitrary CSS styling to the overlay elements.
+
+### description
+
+`description` is a string describing the particular boundary expression. While technically optional, it is the primary way to provide context behind a particular boundary expression for viewers; additionally, `description` is used as the text for `tooltip` overlays, if present.
 
 ## postMessage Specification
 
