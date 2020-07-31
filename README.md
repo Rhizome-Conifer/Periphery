@@ -146,6 +146,8 @@ By default, the sidebar only accepts `postMessage`s from the same origin, so if 
 
 **cdx-endpoint:** The specific endpoint to hit for backend queries. Defaults to `/cdx`.
 
+**embedded:** If enabled, the enclosing sidebar div will be removed and the list of boundary expressions will be the outermost element. This is intended to allow for embedding of the list of boundary expressions into existing sidebars or other replay metadata UIs.
+
 
 
 ## Boundary Spec
